@@ -9,27 +9,44 @@ The Node dependencies in this directory are only for browser and accessibility t
 From the repository root:
 
 ```sh
-python3 -m http.server 8765 --bind 127.0.0.1 --directory site
+make preview
+# Choose another port if needed:
+make preview PORT=9000
 ```
 
 Open <http://127.0.0.1:8765>. This preview server is for local use. It uses its own
 default error response; production Caddy serves our `404.html` with a 404 status.
+Ctrl-C stops the server. `make serve` is an alias. Previewing needs only Make and
+Python 3; it does not need the browser-test packages. The default binding is
+`127.0.0.1`; `HOST` and `PORT` can be overridden explicitly.
 
 ## Check
 
 ```sh
-python3 scripts/site/test_content.py
-python3 scripts/site/test_http.py  # requires Caddy
-npm ci --prefix scripts/site
-cd scripts/site
-npx playwright install chromium
-npm test
+make setup        # install test packages and Chromium
+make check        # all checks, including the Caddy configuration
+make screenshots  # checks plus desktop/mobile screenshots in .artifacts/screenshots/
 ```
 
-To use a system Chromium instead, set `CHROMIUM=/usr/bin/chromium`. Optionally set
-`SCREENSHOT_DIR=/tmp/comfyware-screenshots` to save desktop and mobile screenshots.
-`SITE_URL=http://127.0.0.1:8765` tests a server already running. Without `SITE_URL`,
-the test starts and stops its own temporary server on an available port.
+The checks need Python 3.9 or later, Node.js 20 or later, and Caddy on `PATH`.
+`make setup` installs the packages in `scripts/site/` from the lockfile, then
+downloads Chromium. If browser system libraries are missing, run
+`make browser-install PLAYWRIGHT_INSTALL_ARGS=--with-deps` after installing the
+test packages; installing those system packages may require administrator access.
+
+To use an existing Chromium installation instead of downloading one:
+
+```sh
+make deps
+make check CHROMIUM=/usr/bin/chromium
+make screenshots CHROMIUM=/usr/bin/chromium SCREENSHOT_DIR=/tmp/comfyware-screenshots
+```
+
+Run individual suites with `make test-content`, `make test-http`, or
+`make test-browser`. `make test` is an alias for `make check`.
+`make test-browser SITE_URL=http://127.0.0.1:8765` tests a server already running.
+Without `SITE_URL`, the browser suite starts and stops its own temporary server
+on an available port. `make help` lists all targets and overrides.
 
 The checks validate every route, local link and fragment, image dimensions,
 canonical metadata, sitemap, asset boundaries, and markup structure. Ten deliberate
@@ -58,7 +75,7 @@ The repository and these scripts must stay outside the public document root.
 Validate the configuration before reloading an existing server:
 
 ```sh
-caddy validate --config scripts/site/Caddyfile --adapter caddyfile
+make check-config
 ```
 
 This repository does not automatically deploy the site. Publishing is a separate

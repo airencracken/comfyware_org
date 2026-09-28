@@ -9,11 +9,25 @@ live in `site/`; there is no frontend build step or JavaScript dependency.
 ## Preview
 
 ```sh
-python3 -m http.server 8765 --bind 127.0.0.1 --directory site
+make preview
 ```
 
-Open <http://127.0.0.1:8765>. See the [website guide](scripts/site/README.md) for
-tests, screenshots, asset provenance, and the production Caddy configuration.
+Open <http://127.0.0.1:8765>. Use `make preview PORT=9000` for another port;
+Ctrl-C stops the server. Previewing requires only Make and Python 3.
+
+Run `make help` (or just `make`) for all targets. For development checks, install
+Node.js 20 or later and Caddy, then run:
+
+```sh
+make setup
+make check
+make screenshots
+```
+
+If Chromium is already installed, use `make deps` followed by
+`make check CHROMIUM=/usr/bin/chromium` instead. See the
+[website guide](scripts/site/README.md) for more options, asset provenance,
+and the production Caddy configuration.
 
 ## Repository layout
 

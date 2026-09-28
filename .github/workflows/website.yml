@@ -2,9 +2,9 @@ name: Website checks
 
 on:
   push:
-    paths: ['site/**', 'scripts/site/**', '.github/workflows/website.yml']
+    paths: ['site/**', 'scripts/site/**', 'Makefile', '.github/workflows/website.yml']
   pull_request:
-    paths: ['site/**', 'scripts/site/**', '.github/workflows/website.yml']
+    paths: ['site/**', 'scripts/site/**', 'Makefile', '.github/workflows/website.yml']
   workflow_dispatch:
 
 permissions:
@@ -16,19 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Validate routes, markup, metadata, and assets
-        run: python3 scripts/site/test_content.py
+        run: make test-content
       - name: Install Caddy for HTTP checks
         run: |
           sudo apt-get update || exit 1
           sudo apt-get install -y caddy || exit 1
       - name: Check production HTTP behavior
-        run: python3 scripts/site/test_http.py
-      - name: Install browser test dependencies
-        working-directory: scripts/site
-        run: npm ci
-      - name: Install Chromium
-        working-directory: scripts/site
-        run: npx playwright install --with-deps chromium
+        run: make test-http check-config
+      - name: Install browser test dependencies and Chromium
+        run: make setup PLAYWRIGHT_INSTALL_ARGS=--with-deps
       - name: Check responsive layouts, accessibility, and navigation
-        working-directory: scripts/site
-        run: npm test
+        run: make test-browser
