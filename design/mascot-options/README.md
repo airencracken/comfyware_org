@@ -2,8 +2,10 @@
 
 Two preview concepts requested after the bear: a comfortable little robot and a
 comfortable person. Both take their friendly outlines, simple faces, and soft
-shading from Imvault's keeper and Witmoot's Moot Knight. Neither option replaces
-the homepage mascot until a direction is selected.
+shading from Imvault's keeper and Witmoot's Moot Knight. The robot was selected
+and then refined with simpler shapes and a quieter expression. See the
+[current mascot and edit prompt](../../docs/mascot.md). These original options
+remain here as design history, alongside the [earlier bear concept](bear.md).
 
 Generated with the built-in `image_gen` tool on 2026-09-28. These PNGs are saved
 unchanged from the generated outputs, preserving their transparent backgrounds.
