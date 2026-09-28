@@ -26,6 +26,7 @@ class Document(HTMLParser):
         self.ids = []
         self.stack = []
         self.errors = []
+        self.inline_script = False
         self.feed(text)
         self.close()
         if self.stack:
@@ -44,6 +45,10 @@ class Document(HTMLParser):
             self.errors.append(f"Mismatched closing tag: {tag}")
         else:
             self.stack.pop()
+
+    def handle_data(self, data):
+        if self.stack and self.stack[-1] == "script" and data.strip():
+            self.inline_script = True
 
 
 def validate_site(root):
@@ -75,8 +80,20 @@ def validate_site(root):
             errors.append(f"{route}: Incorrect canonical URL")
         if route == "/404.html" and names.get("robots") != "noindex":
             errors.append(f"{route}: Error page must be noindex")
-        if doc.tags["script"] or doc.tags["iframe"] or doc.tags["form"] or doc.tags["base"]:
+        if (doc.tags["script"] != [{"src": "/assets/theme.js"}] or doc.inline_script
+                or doc.tags["iframe"] or doc.tags["form"] or doc.tags["base"]):
             errors.append(f"{route}: Unexpected active content")
+        if text.find('<script src="/assets/theme.js"></script>') > text.find('rel="stylesheet"'):
+            errors.append(f"{route}: Theme must load before the stylesheet")
+        icons = [tag for tag in doc.tags["link"] if tag.get("rel") == "icon"]
+        if icons != [{"rel": "icon", "href": "/assets/comfy-robot.png", "type": "image/png", "sizes": "1254x1254"}]:
+            errors.append(f"{route}: Missing mascot favicon")
+        if doc.tags["select"] != [{"id": "theme"}]:
+            errors.append(f"{route}: Missing theme control")
+        if [option.get("value") for option in doc.tags["option"]] != ["system", "light", "dark"]:
+            errors.append(f"{route}: Invalid theme choices")
+        if not any(label.get("class") == "theme-picker" and "hidden" in label for label in doc.tags["label"]):
+            errors.append(f"{route}: Theme control must start hidden without JavaScript")
         for tag, elements in doc.tags.items():
             for attrs in elements:
                 if any(key.startswith("on") for key in attrs) or "style" in attrs:
@@ -100,14 +117,14 @@ def validate_site(root):
             errors.append(f"{route}: Missing support link")
 
     for route, doc in documents.items():
-        for tag, attr in (("a", "href"), ("img", "src"), ("link", "href")):
+        for tag, attr in (("a", "href"), ("img", "src"), ("link", "href"), ("script", "src")):
             for element in doc.tags[tag]:
                 ref = element.get(attr, "")
                 url = urlsplit(ref)
                 if url.scheme or url.netloc:
                     if url.scheme != "https" or not url.netloc:
                         errors.append(f"{route}: Unsafe URL: {ref}")
-                    if tag == "img" or (tag == "link" and element.get("rel") != "canonical"):
+                    if tag in ("img", "script") or (tag == "link" and element.get("rel") != "canonical"):
                         errors.append(f"{route}: External asset: {ref}")
                     continue
                 if not ref or not ref.startswith(("/", "#")):
@@ -138,7 +155,7 @@ class SiteContractTests(unittest.TestCase):
 
     def test_no_private_or_build_files_in_public_root(self):
         self.assertEqual({str(p.relative_to(SITE)) for p in SITE.rglob("*") if p.is_file()}, {
-            *ROUTES.values(), "assets/site.css", "assets/mark.svg", "assets/comfy-robot.png", "assets/imvault-gallery.png",
+            *ROUTES.values(), "assets/site.css", "assets/theme.js", "assets/mark.svg", "assets/comfy-robot.png", "assets/imvault-gallery.png",
             "assets/witmoot-board.png", "robots.txt", "sitemap.xml",
         })
 
@@ -148,6 +165,12 @@ class SiteContractTests(unittest.TestCase):
             ('href="#software"', 'href="#missing"', "Broken fragment"),
             ('id="software"', 'id="main"', "Duplicate IDs"),
             ('</head>', '<script src="/bad.js"></script></head>', "Unexpected active content"),
+            ('src="/assets/theme.js"', 'src="https://example.com/theme.js"', "Unexpected active content"),
+            ('</script>', 'alert(1)</script>', "Unexpected active content"),
+            ('<script src="/assets/theme.js">', '<script defer src="/assets/theme.js">', "Unexpected active content"),
+            ('href="/assets/comfy-robot.png"', 'href="/assets/mark.svg"', "Missing mascot favicon"),
+            ('value="dark"', 'value="unexpected"', "Invalid theme choices"),
+            ('class="theme-picker" hidden', 'class="theme-picker"', "Theme control must start hidden"),
             ('<body>', '<body onload="alert(1)">', "Inline code"),
             ('href="https://comfyware.org/"', 'href="https://example.com/"', "Incorrect canonical"),
             ('href="#about"', 'href="javascript:alert(1)"', "Unsafe URL"),

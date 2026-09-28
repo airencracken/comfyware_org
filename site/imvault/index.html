@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Imvault — A home for your photos · Comfyware</title>
   <meta name="description" content="Keep photos, screenshots, GIFs, and short clips in Imvault, a small, self-hosted image library for you and your people.">
-  <meta name="theme-color" content="#f7f5ed">
   <link rel="canonical" href="https://comfyware.org/imvault/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Imvault — A home for your photos">
@@ -13,12 +12,16 @@
   <meta property="og:url" content="https://comfyware.org/imvault/">
   <meta property="og:image" content="https://comfyware.org/assets/imvault-gallery.png">
   <meta property="og:image:alt" content="An Imvault demo gallery with sample images and clips">
-  <link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#f7f5ed" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#18221e" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/comfy-robot.png" type="image/png" sizes="1254x1254">
+  <script src="/assets/theme.js"></script>
   <link rel="stylesheet" href="/assets/site.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  <header class="site-header wrap"><a class="brand" href="/" aria-label="Comfyware home"><img src="/assets/mark.svg" width="35" height="35" alt=""><span class="wordmark">comfyware</span></a><nav class="site-nav" aria-label="Main navigation"><a href="/imvault/" aria-current="page">Imvault</a><a href="/witmoot/">Witmoot</a><a href="/#support">Support</a></nav></header>
+  <header class="site-header wrap"><a class="brand" href="/" aria-label="Comfyware home"><img src="/assets/mark.svg" width="35" height="35" alt=""><span class="wordmark">comfyware</span></a><nav class="site-nav" aria-label="Main navigation"><a href="/imvault/" aria-current="page">Imvault</a><a href="/witmoot/">Witmoot</a><a href="/#support">Support</a></nav>
+    <label class="theme-picker" hidden><span class="visually-hidden">Color theme</span><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></header>
   <main id="main" class="wrap" tabindex="-1">
     <a class="back-link" href="/#software"><span aria-hidden="true">←</span> All our software</a>
     <section class="hero product-hero" aria-labelledby="welcome"><p class="eyebrow">Imvault · Photos &amp; little movies</p><h1 id="welcome">A little vault for<br>“I should save that.”</h1><p class="intro">The family album, your finest screenshots, and that video of the cat. Keep them somewhere you run, and share them with the people who’ll appreciate them.</p><div class="hero-links"><a class="button" href="https://github.com/airencracken/imvault/blob/master/docs/releases.md">Get started with Imvault <span aria-hidden="true">&nbsp;↗</span></a><a class="text-link" href="https://github.com/airencracken/imvault">Explore the source</a></div><p class="product-note">Self-hosted · Open source · Linux binaries and Debian packages available</p></section>

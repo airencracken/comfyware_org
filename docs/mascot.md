@@ -17,7 +17,8 @@ without an antenna, simple feet and joints, open oval eyes, and a small smile.
   and small shading details while retaining the selected expression and pose.
 - The generated PNG is copied unchanged, preserving its alpha channel. No CLI
   fallback or image post-processing was used.
-- Used in the homepage introduction and homepage sharing metadata. Earlier
+- Used in the homepage introduction, homepage sharing metadata, and every page's
+  favicon. The favicon reuses the original transparent PNG. Earlier
   concepts are kept outside the public site under `design/mascot-options/`.
 
 ## Final edit prompt

@@ -3,7 +3,7 @@
 	root * {$COMFYWARE_ROOT:/srv/comfyware}
 	encode zstd gzip
 	header {
-		Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+		Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
 		X-Content-Type-Options nosniff
 		Referrer-Policy strict-origin-when-cross-origin
 	}

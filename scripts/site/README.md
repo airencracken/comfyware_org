@@ -1,7 +1,12 @@
 # Comfyware website
 
-The public website lives in `site/`: plain HTML, one stylesheet, and local assets.
-There is no frontend framework, JavaScript, build step, remote font, or analytics.
+The public website lives in `site/`: plain HTML, one stylesheet, a small theme
+script, and local assets. There is no frontend framework, build step, remote font,
+or analytics. The site follows the device's light/dark preference by default.
+The header's System/Light/Dark control saves an explicit choice in localStorage
+and synchronizes it across tabs. If storage is blocked, the choice works for the
+current page. Without JavaScript, the site still follows the device preference
+and all content and navigation work; the theme control stays hidden.
 The Node dependencies in this directory are only for browser and accessibility tests.
 
 ## Preview
@@ -49,14 +54,17 @@ Without `SITE_URL`, the browser suite starts and stops its own temporary server
 on an available port. `make help` lists all targets and overrides.
 
 The checks validate every route, local link and fragment, image dimensions,
-canonical metadata, sitemap, asset boundaries, and markup structure. Ten deliberate
+canonical metadata, sitemap, asset boundaries, and markup structure. Deliberate
 page mutations check that broken links, traversal references, injected code, wrong
-metadata, and external assets fail validation. Browser checks cover four widths,
-WCAG A/AA automated accessibility checks, and keyboard/navigation/FAQ use without
-JavaScript. The HTTP tests start a temporary Caddy instance using the shipping
+metadata, and external assets fail validation. Browser checks cover both palettes
+at four widths, WCAG A/AA automated accessibility checks, theme persistence,
+system changes, cross-tab synchronization, invalid or blocked storage, and applying
+the saved theme before the stylesheet loads. They also check keyboard/navigation/FAQ
+use without JavaScript. Screenshots include both palettes in their filenames.
+The HTTP tests start a temporary Caddy instance using the shipping
 site block, and check status codes, redirects, content types, caching, headers,
 read-only methods, and attempts to read paths outside the public site.
-There is no application API or mutable state to test.
+There is no application API or server-side mutable state to test.
 
 ## Host
 
@@ -98,7 +106,8 @@ Screenshots are copied, unmodified, from the projects' demo/test screenshots:
 
 They contain sample media and conversations, not a live community. The house mark
 is an SVG drawn for this site. `assets/comfy-robot.png` is the site's comfy robot
-mascot. It was generated with the built-in image tool, taking inspiration from
+mascot, also used directly as the favicon on every page. It was generated with
+the built-in image tool, taking inspiration from
 Imvault's keeper and Witmoot's Moot Knight, then edited to simplify its shapes and
 soften its expression. Its transparent PNG is preserved as generated; see the
 [mascot prompt and provenance](../../docs/mascot.md). Earlier concepts are kept

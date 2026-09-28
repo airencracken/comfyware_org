@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Comfyware — Software for your people</title>
   <meta name="description" content="Small, open-source apps for friends, family, and communities. Share photos with Imvault and make room for conversation with Witmoot. Yours to host.">
-  <meta name="theme-color" content="#f7f5ed">
   <link rel="canonical" href="https://comfyware.org/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Comfyware — Software for your people">
@@ -13,7 +12,10 @@
   <meta property="og:url" content="https://comfyware.org/">
   <meta property="og:image" content="https://comfyware.org/assets/comfy-robot.png">
   <meta property="og:image:alt" content="A comfy little robot in a green sweater, holding coffee in an armchair">
-  <link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#f7f5ed" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#18221e" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/comfy-robot.png" type="image/png" sizes="1254x1254">
+  <script src="/assets/theme.js"></script>
   <link rel="stylesheet" href="/assets/site.css">
 </head>
 <body>
@@ -21,6 +23,7 @@
   <header class="site-header wrap">
     <a class="brand" href="/" aria-label="Comfyware home"><img src="/assets/mark.svg" width="35" height="35" alt=""><span class="wordmark">comfyware</span></a>
     <nav class="site-nav" aria-label="Main navigation"><a href="#software">The software</a><a href="#about">Our approach</a><a href="#support">Support</a></nav>
+    <label class="theme-picker" hidden><span class="visually-hidden">Color theme</span><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
   </header>
   <main id="main" class="wrap" tabindex="-1">
     <section class="hero home-hero" aria-labelledby="welcome">

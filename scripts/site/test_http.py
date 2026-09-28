@@ -82,7 +82,7 @@ class HTTPContractTests(unittest.TestCase):
                 self.assertEqual(headers["cache-control"], "no-cache")
 
     def test_assets_and_content_types(self):
-        assets = {"/assets/site.css": "text/css", "/assets/mark.svg": "image/svg+xml", "/assets/comfy-robot.png": "image/png",
+        assets = {"/assets/site.css": "text/css", "/assets/theme.js": "text/javascript", "/assets/mark.svg": "image/svg+xml", "/assets/comfy-robot.png": "image/png",
                   "/assets/imvault-gallery.png": "image/png", "/assets/witmoot-board.png": "image/png"}
         for route, mime in assets.items():
             with self.subTest(route=route):
@@ -134,6 +134,8 @@ class HTTPContractTests(unittest.TestCase):
             self.assertEqual(headers["x-content-type-options"], "nosniff")
             self.assertEqual(headers["referrer-policy"], "strict-origin-when-cross-origin")
             self.assertIn("default-src 'none'", headers["content-security-policy"])
+            self.assertIn("script-src 'self'", headers["content-security-policy"])
+            self.assertNotIn("unsafe-inline", headers["content-security-policy"])
             self.assertIn("frame-ancestors 'none'", headers["content-security-policy"])
 
 
