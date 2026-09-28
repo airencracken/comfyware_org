@@ -82,7 +82,7 @@ class HTTPContractTests(unittest.TestCase):
                 self.assertEqual(headers["cache-control"], "no-cache")
 
     def test_assets_and_content_types(self):
-        assets = {"/assets/site.css": "text/css", "/assets/mark.svg": "image/svg+xml",
+        assets = {"/assets/site.css": "text/css", "/assets/mark.svg": "image/svg+xml", "/assets/comfy-bear.png": "image/png",
                   "/assets/imvault-gallery.png": "image/png", "/assets/witmoot-board.png": "image/png"}
         for route, mime in assets.items():
             with self.subTest(route=route):

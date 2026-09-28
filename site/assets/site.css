@@ -46,6 +46,8 @@ p + p { margin-top: 1rem; }
 .hero .eyebrow { margin-bottom: 23px; }
 .hero h1 em { font-weight: 400; color: var(--green); }
 .hero .intro { max-width: 630px; font-size: 1.16rem; margin-top: 25px; color: var(--muted); line-height: 1.75; }
+.home-hero { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: center; gap: 35px; max-width: none; }
+.mascot { width: 100%; max-width: 440px; justify-self: center; }
 .hero-links { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 25px; margin-top: 30px; }
 .button { display: inline-flex; justify-content: center; align-items: center; min-height: 46px; padding: 10px 22px; background: var(--green); color: #fffef9; border: 1px solid var(--green); border-radius: 5px; font-size: .91rem; font-weight: 550; text-decoration: none; }
 .button:hover { background: #284534; border-color: #284534; text-decoration: none; }
@@ -124,6 +126,8 @@ details > p { padding: 0 24px 20px; color: var(--muted); }
   .site-nav { gap: 22px; }
   .hero { padding-block: 50px; }
   .hero .intro { font-size: 1.05rem; }
+  .home-hero { grid-template-columns: 1fr; gap: 30px; }
+  .mascot { max-width: 280px; }
   .section { padding-block: 38px; }
   .section-heading { align-items: start; flex-direction: column; gap: 14px; }
   .section-heading > p { max-width: none; }

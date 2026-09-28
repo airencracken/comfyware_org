@@ -138,7 +138,7 @@ class SiteContractTests(unittest.TestCase):
 
     def test_no_private_or_build_files_in_public_root(self):
         self.assertEqual({str(p.relative_to(SITE)) for p in SITE.rglob("*") if p.is_file()}, {
-            *ROUTES.values(), "assets/site.css", "assets/mark.svg", "assets/imvault-gallery.png",
+            *ROUTES.values(), "assets/site.css", "assets/mark.svg", "assets/comfy-bear.png", "assets/imvault-gallery.png",
             "assets/witmoot-board.png", "robots.txt", "sitemap.xml",
         })
 

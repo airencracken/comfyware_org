@@ -97,5 +97,9 @@ Screenshots are copied, unmodified, from the projects' demo/test screenshots:
   `7a2cba7c05d3704fafcd72058e17ba69c99ceddb`.
 
 They contain sample media and conversations, not a live community. The house mark
-is an SVG drawn for this site. Website code and these project assets use the
-repository's AGPL-3.0-or-later license; see the root `LICENSE`.
+is an SVG drawn for this site. `assets/comfy-bear.png` is the site's comfy bear
+mascot, generated with the built-in image tool after inspecting Imvault's keeper
+and Witmoot's Moot Knight for style inspiration. Its transparent PNG is preserved
+as generated; see the [mascot prompt and provenance](../../docs/mascot.md).
+Website code and these project assets use the repository's AGPL-3.0-or-later
+license; see the root `LICENSE`.
