@@ -134,6 +134,11 @@ p + p { margin-top: 1rem; }
 .principles h3 { font-size: .96rem; margin-bottom: 8px; }
 .principles p { color: var(--muted); font-size: .88rem; }
 .principles-note { max-width: 760px; margin-top: 32px; color: var(--muted); font-size: .88rem; }
+.reading-page { max-width: 760px; }
+.reading-intro { padding-bottom: 44px; color: var(--muted); }
+.reading-page .section .eyebrow { margin-bottom: 12px; }
+.reading-page .section h2 { margin-bottom: 24px; }
+.reading-page .section > p:not(.eyebrow) { color: var(--muted); }
 .principle-number { display: block; color: var(--rust); font-family: Georgia, serif; font-size: 1.35rem; margin-bottom: 10px; }
 .workshop { display: grid; grid-template-columns: .95fr 1.2fr; gap: 85px; }
 .workshop .eyebrow { margin-bottom: 12px; }

@@ -15,7 +15,8 @@ import xml.etree.ElementTree as ET
 SITE = Path(__file__).resolve().parents[2] / "site"
 ORIGIN = "https://comfyware.org"
 ROUTES = {"/": "index.html", "/imvault/": "imvault/index.html",
-          "/witmoot/": "witmoot/index.html", "/404.html": "404.html"}
+          "/witmoot/": "witmoot/index.html", "/principles/": "principles/index.html",
+          "/404.html": "404.html"}
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
 
 

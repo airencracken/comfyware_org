@@ -11,7 +11,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { checkThemes } from './themes.mjs';
 
 const root = fileURLToPath(new URL('../../site/', import.meta.url));
-const routes = ['/', '/imvault/', '/witmoot/', '/404.html'];
+const routes = ['/', '/imvault/', '/witmoot/', '/principles/', '/404.html'];
 const screenshotDir = process.env.SCREENSHOT_DIR;
 let server;
 let browser;
@@ -96,6 +96,11 @@ server.serve_forever()
   check(new URL(page.url()).pathname === '/witmoot/', 'Cross-project navigation works without JavaScript');
   await page.getByRole('link', { name: 'Comfyware home' }).click();
   check(new URL(page.url()).pathname === '/', 'Home navigation works without JavaScript');
+  await page.getByRole('link', { name: 'Read the Comfyware principles' }).click();
+  check(new URL(page.url()).origin === new URL(base).origin && new URL(page.url()).pathname === '/principles/', 'Principles open as a page on this site without JavaScript');
+  check(await page.getByRole('heading', { name: 'Local sovereignty', exact: true }).count() === 1, 'The principles page contains the full principles');
+  await page.getByRole('link', { name: 'Back to our little corner' }).click();
+  check(new URL(page.url()).pathname === '/' && new URL(page.url()).hash === '#about', 'Principles link back to the homepage approach section');
   await context.close();
   console.log(`Passed ${checks} browser checks, including both themes at four viewport widths, saved preferences, and navigation without JavaScript.`);
 } finally {

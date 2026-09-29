@@ -75,7 +75,7 @@ class HTTPContractTests(unittest.TestCase):
 
     def test_routes_deliver_exact_documents(self):
         for route, path in (("/", "index.html"), ("/imvault/", "imvault/index.html"),
-                            ("/witmoot/", "witmoot/index.html")):
+                            ("/witmoot/", "witmoot/index.html"), ("/principles/", "principles/index.html")):
             with self.subTest(route=route):
                 status, headers, body = self.request("GET", route)
                 self.assertEqual(status, 200)
@@ -95,7 +95,7 @@ class HTTPContractTests(unittest.TestCase):
                 self.assertEqual(headers["cache-control"], "public, max-age=3600")
 
     def test_directory_redirects(self):
-        for route in ("/imvault", "/witmoot"):
+        for route in ("/imvault", "/witmoot", "/principles"):
             status, headers, _ = self.request("GET", route)
             self.assertEqual(status, 308)
             self.assertEqual(headers["location"], route + "/")
