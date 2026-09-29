@@ -151,6 +151,16 @@ def validate_site(root):
 
 
 class SiteContractTests(unittest.TestCase):
+    def test_product_pages_expose_installation_and_release_routes(self):
+        for app in ("imvault", "witmoot"):
+            with self.subTest(app=app):
+                doc = Document((SITE / app / "index.html").read_text())
+                links = {a.get("href") for a in doc.tags["a"]}
+                origin = f"https://github.com/airencracken/{app}"
+                self.assertIn(origin + "/releases/latest", links)
+                self.assertIn(origin + "/blob/master/docs/releases.md", links)
+                self.assertIn(origin + "/blob/master/docs/deployment.md", links)
+
     def test_public_site_contract(self):
         self.assertEqual(validate_site(SITE), [])
 

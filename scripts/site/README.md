@@ -108,7 +108,7 @@ Screenshots are copied, unmodified, from the projects' demo/test screenshots:
 - `assets/imvault-gallery.png`: `imvault/docs/images/recent.png` at
   `ff69d6af87e87204117c106cbdf2bb803ba31cde`.
 - `assets/witmoot-board.png`: `witmoot/docs/images/board.png` at
-  `7a2cba7c05d3704fafcd72058e17ba69c99ceddb`.
+  `8f20e2f26bf594394526ee7f6a558f013fd3c47b` (0.7.2).
 
 They contain sample media and conversations, not a live community. The house mark
 is an SVG drawn for this site. `assets/comfy-robot.png` is the site's comfy robot
