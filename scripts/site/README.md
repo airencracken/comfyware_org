@@ -92,6 +92,12 @@ in CI or locally; the production host needs only the files in `site/`.
 
 ## Content and assets
 
+The homepage's approach section draws from Witmoot's
+[Comfyware principles](https://github.com/airencracken/witmoot/blob/master/docs/product.md#what-comfyware-means):
+local sovereignty, accountable hosts, respect for attention, bounded communities,
+exit and ownership, and community-defined house rules. These guide product choices;
+they are not a claim that every planned portability feature already exists.
+
 Project links use the installation guides and latest-release redirects, avoiding
 hardcoded versions that become stale. Keep feature descriptions aligned with the
 project READMEs. The Arise description deliberately calls out its experimental
