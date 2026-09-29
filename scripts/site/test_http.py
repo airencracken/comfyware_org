@@ -28,13 +28,15 @@ class HTTPContractTests(unittest.TestCase):
         cls.storage = tempfile.TemporaryDirectory()
         cls.addClassCleanup(cls.storage.cleanup)
         env = {**os.environ, "COMFYWARE_DOMAIN": f"http://127.0.0.1:{cls.port}",
-               "COMFYWARE_ROOT": str(SITE), "XDG_DATA_HOME": cls.storage.name}
+               "COMFYWARE_ROOT": str(SITE),
+               "XDG_DATA_HOME": str(Path(cls.storage.name) / "data"),
+               "XDG_CONFIG_HOME": str(Path(cls.storage.name) / "config")}
         cls.server = subprocess.Popen(
             ["caddy", "run", "--config", "-", "--adapter", "caddyfile"],
             stdin=subprocess.PIPE, stdout=cls.log, stderr=cls.log, env=env,
         )
         cls.addClassCleanup(cls.stop_server)
-        config = "{\n admin off\n persist_config off\n}\n" + (ROOT / "scripts/site/Caddyfile").read_text()
+        config = "{\n admin off\n}\n" + (ROOT / "scripts/site/Caddyfile").read_text()
         config = config.replace("\troot *", "\tbind 127.0.0.1\n\troot *", 1)
         cls.server.stdin.write(config.encode())
         cls.server.stdin.close()
