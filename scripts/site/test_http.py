@@ -126,9 +126,13 @@ class HTTPContractTests(unittest.TestCase):
         self.assertEqual(body, b"")
 
     def test_static_host_rejects_writes(self):
-        for method in ("POST", "PUT", "DELETE"):
-            status, _, _ = self.request(method, "/")
-            self.assertEqual(status, 405)
+        for method in ("POST", "PUT", "PATCH", "DELETE", "OPTIONS", "TRACE"):
+            for path in ("/", "/assets/site.css", "/missing"):
+                with self.subTest(method=method, path=path):
+                    status, headers, body = self.request(method, path)
+                    self.assertEqual(status, 405)
+                    self.assertEqual(headers["allow"], "GET, HEAD")
+                    self.assertEqual(body, b"Method Not Allowed")
 
     def test_security_headers(self):
         for path in ("/", "/assets/site.css", "/missing"):

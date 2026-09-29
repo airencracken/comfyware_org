@@ -11,6 +11,9 @@
 	header @documents Cache-Control no-cache
 	@assets path /assets/*
 	header @assets Cache-Control "public, max-age=3600"
+	@unsupported not method GET HEAD
+	header @unsupported Allow "GET, HEAD"
+	respond @unsupported "Method Not Allowed" 405
 	file_server
 	handle_errors {
 		rewrite * /404.html
