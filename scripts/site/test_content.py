@@ -156,8 +156,11 @@ def validate_site(root):
                     errors.append(f"{route}: Oversized image: {src}")
         if not any(a.get("href") == "#main" for a in doc.tags["a"]):
             errors.append(f"{route}: Missing skip link")
-        if not any(a.get("href") == "https://ko-fi.com/airencracken" for a in doc.tags["a"]):
-            errors.append(f"{route}: Missing sponsor link")
+        # One way to sponsor: the navigation leads to the home page's sponsor
+        # section, which holds the only Ko-fi link.
+        kofi = sum(a.get("href") == "https://ko-fi.com/airencracken" for a in doc.tags["a"])
+        if kofi != (1 if route == "/" else 0):
+            errors.append(f"{route}: Expected the Ko-fi link only in the home page's sponsor section")
 
     for route, doc in documents.items():
         for tag, attr in (("a", "href"), ("img", "src"), ("link", "href"), ("script", "src")):
@@ -223,6 +226,11 @@ class SiteContractTests(unittest.TestCase):
             ('</script>', 'alert(1)</script>', "Unexpected active content"),
             ('<script src="/assets/theme.js">', '<script defer src="/assets/theme.js">', "Unexpected active content"),
             ('href="/assets/favicon-64.png"', 'href="/assets/mark.svg"', "Missing mascot favicon"),
+            ('<a href="/principles/">Principles</a><a href="https://github.com/airencracken/comfyware_org">Source</a></div>',
+             '<a href="/principles/">Principles</a><a href="https://github.com/airencracken/comfyware_org">Source</a><a href="https://ko-fi.com/airencracken">Ko-fi</a></div>',
+             "Expected the Ko-fi link only"),
+            ('<a class="button secondary" href="https://ko-fi.com/airencracken">', '<a class="button secondary" href="/principles/">',
+             "Expected the Ko-fi link only"),
             ('href="/assets/favicon-64.png"', 'href="/assets/comfy-robot.png"', "Missing mascot favicon"),
             ('src="/assets/comfy-robot.webp" width="680"', 'src="/assets/comfy-robot.png" width="1254"', "Oversized image"),
             ('width="680"', 'width="681"', "Incorrect image dimensions"),
