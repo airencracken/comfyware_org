@@ -86,9 +86,22 @@ Validate the configuration before reloading an existing server:
 make check-config
 ```
 
-This repository does not automatically deploy the site. Publishing is a separate
-step once the hosting destination is chosen. Install dependencies and run checks
-in CI or locally; the production host needs only the files in `site/`.
+Publish from a checkout on the web server:
+
+```sh
+git pull
+DRY_RUN=1 make deploy   # list what would change
+make deploy
+```
+
+`make deploy` runs the content checks, then copies `site/` to `DEPLOY_DIR`
+(default `/var/www/comfyware`) with rsync. The document root becomes an exact
+copy: pages and assets removed from `site/` stop being served, and files are
+published world-readable (directories 0755, files 0644). It needs Python 3 and
+rsync, nothing from the browser or Caddy checks. It refuses a destination that
+is missing, relative, `/`, inside this repository, or that contains it. Set
+`DEPLOY_DIR=/srv/comfyware` to match the Caddyfile's default root. CI does not
+deploy; run the full `make check` there or locally before publishing.
 
 ## Content and assets
 
