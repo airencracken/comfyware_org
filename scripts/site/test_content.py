@@ -17,7 +17,7 @@ ORIGIN = "https://comfyware.org"
 ROUTES = {"/": "index.html", "/imvault/": "imvault/index.html",
           "/witmoot/": "witmoot/index.html", "/principles/": "principles/index.html",
           "/404.html": "404.html"}
-NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/principles/", "Principles"), ("/#support", "Support")]
+NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/principles/", "Principles"), ("/#sponsor", "Sponsor")]
 # Bytes a visitor downloads for one page image; the original mascot is only an
 # Open Graph preview.
 IMAGE_BUDGET = 200_000
@@ -157,7 +157,7 @@ def validate_site(root):
         if not any(a.get("href") == "#main" for a in doc.tags["a"]):
             errors.append(f"{route}: Missing skip link")
         if not any(a.get("href") == "https://ko-fi.com/airencracken" for a in doc.tags["a"]):
-            errors.append(f"{route}: Missing support link")
+            errors.append(f"{route}: Missing sponsor link")
 
     for route, doc in documents.items():
         for tag, attr in (("a", "href"), ("img", "src"), ("link", "href"), ("script", "src")):
@@ -226,7 +226,7 @@ class SiteContractTests(unittest.TestCase):
             ('href="/assets/favicon-64.png"', 'href="/assets/comfy-robot.png"', "Missing mascot favicon"),
             ('src="/assets/comfy-robot.webp" width="680"', 'src="/assets/comfy-robot.png" width="1254"', "Oversized image"),
             ('width="680"', 'width="681"', "Incorrect image dimensions"),
-            ('<a href="/principles/">Principles</a><a href="/#support">', '<a href="/#support">', "Navigation differs"),
+            ('<a href="/principles/">Principles</a><a href="/#sponsor">', '<a href="/#sponsor">', "Navigation differs"),
             ('<a href="/witmoot/">Witmoot</a><a href="/principles/">', '<a href="/witmoot/" aria-current="page">Witmoot</a><a href="/principles/">', "Navigation differs"),
             ('value="dark"', 'value="unexpected"', "Invalid theme choices"),
             ('class="theme-picker" hidden', 'class="theme-picker"', "Theme control must start hidden"),
