@@ -151,9 +151,9 @@ p + p { margin-top: 1rem; }
 details { border-bottom: 1px solid var(--line); }
 summary { cursor: pointer; padding: 18px 0; font-weight: 550; }
 details > p { padding: 0 24px 20px; color: var(--muted); }
-.sponsor { margin-top: 10px; margin-bottom: 65px; padding: 32px 38px; background: var(--wash); border: 1px solid var(--sponsor-line); border-radius: 6px; display: flex; align-items: center; justify-content: space-between; gap: 30px; scroll-margin-top: 25px; }
-.sponsor h2 { font-size: 1.9rem; margin-bottom: 9px; }
-.sponsor p { font-size: .91rem; color: var(--muted); max-width: 660px; }
+.sponsor { max-width: 760px; margin-top: 10px; margin-bottom: 65px; padding: 24px 28px; background: var(--wash); border: 1px solid var(--sponsor-line); border-radius: 6px; display: flex; align-items: center; justify-content: space-between; gap: 30px; scroll-margin-top: 25px; }
+.sponsor h2 { font-size: 1.45rem; margin-bottom: 6px; }
+.sponsor p { font-size: .91rem; color: var(--muted); }
 .sponsor > a { flex-shrink: 0; }
 .site-footer { border-top: 1px solid var(--line); padding-block: 27px 35px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; font-size: .79rem; color: var(--muted); }
 .footer-links { display: flex; flex-wrap: wrap; gap: 22px; }
@@ -201,7 +201,7 @@ details > p { padding: 0 24px 20px; color: var(--muted); }
   .project-preview { padding: 18px 18px 0; }
   .about-layout h2 { max-width: 420px; }
   .principles { gap: 23px; }
-  .sponsor { padding: 27px; align-items: start; flex-direction: column; margin-bottom: 40px; }
+  .sponsor { padding: 22px; align-items: start; flex-direction: column; margin-bottom: 40px; }
   .screenshot { padding: 12px; margin-bottom: 30px; }
   .screenshot figcaption { padding-inline: 3px; }
   .features { gap: 25px; }
