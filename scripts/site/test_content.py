@@ -17,6 +17,11 @@ ORIGIN = "https://comfyware.org"
 ROUTES = {"/": "index.html", "/imvault/": "imvault/index.html",
           "/witmoot/": "witmoot/index.html", "/principles/": "principles/index.html",
           "/404.html": "404.html"}
+NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/principles/", "Principles"), ("/#support", "Support")]
+# Bytes a visitor downloads for one page image; the original mascot is only an
+# Open Graph preview.
+IMAGE_BUDGET = 200_000
+ICON_BUDGET = 64_000
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
 
 
@@ -27,6 +32,8 @@ class Document(HTMLParser):
         self.ids = []
         self.stack = []
         self.errors = []
+        self.nav = None
+        self.nav_text = None
         self.inline_script = False
         self.feed(text)
         self.close()
@@ -38,6 +45,10 @@ class Document(HTMLParser):
         self.tags[tag].append(attrs)
         if "id" in attrs:
             self.ids.append(attrs["id"])
+        if tag == "nav" and attrs.get("class") == "site-nav":
+            self.nav = []
+        elif tag == "a" and self.nav is not None and "nav" in self.stack:
+            self.nav.append([attrs.get("href"), "", attrs.get("aria-current")])
         if tag not in VOID:
             self.stack.append(tag)
 
@@ -48,8 +59,27 @@ class Document(HTMLParser):
             self.stack.pop()
 
     def handle_data(self, data):
+        if self.nav and "nav" in self.stack and self.stack[-1] == "a":
+            self.nav[-1][1] += data
         if self.stack and self.stack[-1] == "script" and data.strip():
             self.inline_script = True
+
+
+def image_size(path):
+    """Return (width, height) for the PNG and WebP files the site uses."""
+    data = path.read_bytes()[:40]
+    if data.startswith(b"\x89PNG"):
+        return struct.unpack(">II", data[16:24])
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        chunk = data[12:16]
+        if chunk == b"VP8X":
+            return (int.from_bytes(data[24:27], "little") + 1, int.from_bytes(data[27:30], "little") + 1)
+        if chunk == b"VP8 ":
+            return struct.unpack("<HH", data[26:30])[0] & 0x3FFF, struct.unpack("<HH", data[26:30])[1] & 0x3FFF
+        if chunk == b"VP8L":
+            bits = int.from_bytes(data[21:25], "little")
+            return (bits & 0x3FFF) + 1, ((bits >> 14) & 0x3FFF) + 1
+    return None
 
 
 def validate_site(root):
@@ -86,9 +116,18 @@ def validate_site(root):
             errors.append(f"{route}: Unexpected active content")
         if text.find('<script src="/assets/theme.js"></script>') > text.find('rel="stylesheet"'):
             errors.append(f"{route}: Theme must load before the stylesheet")
-        icons = [tag for tag in doc.tags["link"] if tag.get("rel") == "icon"]
-        if icons != [{"rel": "icon", "href": "/assets/comfy-robot.png", "type": "image/png", "sizes": "1254x1254"}]:
+        icons = [tag for tag in doc.tags["link"] if tag.get("rel") in ("icon", "apple-touch-icon")]
+        if icons != [{"rel": "icon", "href": "/assets/favicon-64.png", "type": "image/png", "sizes": "64x64"},
+                     {"rel": "apple-touch-icon", "href": "/assets/apple-touch-icon.png"}]:
             errors.append(f"{route}: Missing mascot favicon")
+        for icon in icons:
+            path = root / icon.get("href", "").lstrip("/")
+            if path.is_file() and path.stat().st_size > ICON_BUDGET:
+                errors.append(f"{route}: Oversized icon: {icon['href']}")
+        current = {"/imvault/": "/imvault/", "/witmoot/": "/witmoot/", "/principles/": "/principles/"}.get(route)
+        expected_nav = [[href, text, "page" if href == current else None] for href, text in NAV]
+        if doc.nav != expected_nav:
+            errors.append(f"{route}: Navigation differs from the other pages")
         if doc.tags["select"] != [{"id": "theme"}]:
             errors.append(f"{route}: Missing theme control")
         if [option.get("value") for option in doc.tags["option"]] != ["system", "light", "dark"]:
@@ -108,10 +147,13 @@ def validate_site(root):
             if not all(attrs.get(key, "").isdigit() for key in ("width", "height")):
                 errors.append(f"{route}: Missing image dimensions")
             src = attrs.get("src", "")
-            if src.endswith(".png") and (root / src.lstrip("/")).is_file():
-                dimensions = struct.unpack(">II", (root / src.lstrip("/")).read_bytes()[16:24])
-                if tuple(map(str, dimensions)) != (attrs.get("width"), attrs.get("height")):
+            path = root / src.lstrip("/")
+            if src.startswith("/") and not src.endswith(".svg") and path.is_file():
+                dimensions = image_size(path)
+                if dimensions is None or tuple(map(str, dimensions)) != (attrs.get("width"), attrs.get("height")):
                     errors.append(f"{route}: Incorrect image dimensions: {src}")
+                if path.stat().st_size > IMAGE_BUDGET:
+                    errors.append(f"{route}: Oversized image: {src}")
         if not any(a.get("href") == "#main" for a in doc.tags["a"]):
             errors.append(f"{route}: Missing skip link")
         if not any(a.get("href") == "https://ko-fi.com/airencracken" for a in doc.tags["a"]):
@@ -166,7 +208,8 @@ class SiteContractTests(unittest.TestCase):
 
     def test_no_private_or_build_files_in_public_root(self):
         self.assertEqual({str(p.relative_to(SITE)) for p in SITE.rglob("*") if p.is_file()}, {
-            *ROUTES.values(), "assets/site.css", "assets/theme.js", "assets/mark.svg", "assets/comfy-robot.png", "assets/imvault-gallery.png",
+            *ROUTES.values(), "assets/site.css", "assets/theme.js", "assets/mark.svg", "assets/comfy-robot.png",
+            "assets/comfy-robot.webp", "assets/favicon-64.png", "assets/apple-touch-icon.png", "assets/imvault-gallery.png",
             "assets/witmoot-board.png", "robots.txt", "sitemap.xml",
         })
 
@@ -179,7 +222,12 @@ class SiteContractTests(unittest.TestCase):
             ('src="/assets/theme.js"', 'src="https://example.com/theme.js"', "Unexpected active content"),
             ('</script>', 'alert(1)</script>', "Unexpected active content"),
             ('<script src="/assets/theme.js">', '<script defer src="/assets/theme.js">', "Unexpected active content"),
-            ('href="/assets/comfy-robot.png"', 'href="/assets/mark.svg"', "Missing mascot favicon"),
+            ('href="/assets/favicon-64.png"', 'href="/assets/mark.svg"', "Missing mascot favicon"),
+            ('href="/assets/favicon-64.png"', 'href="/assets/comfy-robot.png"', "Missing mascot favicon"),
+            ('src="/assets/comfy-robot.webp" width="680"', 'src="/assets/comfy-robot.png" width="1254"', "Oversized image"),
+            ('width="680"', 'width="681"', "Incorrect image dimensions"),
+            ('<a href="/principles/">Principles</a><a href="/#support">', '<a href="/#support">', "Navigation differs"),
+            ('<a href="/witmoot/">Witmoot</a><a href="/principles/">', '<a href="/witmoot/" aria-current="page">Witmoot</a><a href="/principles/">', "Navigation differs"),
             ('value="dark"', 'value="unexpected"', "Invalid theme choices"),
             ('class="theme-picker" hidden', 'class="theme-picker"', "Theme control must start hidden"),
             ('<body>', '<body onload="alert(1)">', "Inline code"),
@@ -197,6 +245,23 @@ class SiteContractTests(unittest.TestCase):
                 self.assertIn(old, path.read_text())
                 path.write_text(path.read_text().replace(old, new, 1))
                 self.assertTrue(any(expected in error for error in validate_site(root)))
+
+
+class ImageSizeTests(unittest.TestCase):
+    def test_every_webp_layout_is_measured(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "image.webp"
+            cases = {
+                "VP8X": b"RIFF\0\0\0\0WEBPVP8X" + bytes(8) + (99).to_bytes(3, "little") + (49).to_bytes(3, "little"),
+                "VP8 ": b"RIFF\0\0\0\0WEBPVP8 " + bytes(10) + struct.pack("<HH", 100, 50),
+                "VP8L": b"RIFF\0\0\0\0WEBPVP8L" + bytes(5) + (99 | (49 << 14)).to_bytes(4, "little"),
+            }
+            for chunk, data in cases.items():
+                with self.subTest(chunk=chunk):
+                    path.write_bytes(data + bytes(16))
+                    self.assertEqual(tuple(image_size(path)), (100, 50))
+            path.write_bytes(b"GIF89a" + bytes(40))
+            self.assertIsNone(image_size(path))
 
 
 if __name__ == "__main__":
