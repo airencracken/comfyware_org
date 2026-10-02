@@ -22,7 +22,7 @@ jobs:
           sudo apt-get update || exit 1
           sudo apt-get install -y caddy || exit 1
       - name: Check production HTTP behavior
-        run: make test-http check-config
+        run: make test-http test-deploy check-config
       - name: Install browser test dependencies and Chromium
         run: make setup PLAYWRIGHT_INSTALL_ARGS=--with-deps
       - name: Check responsive layouts, accessibility, and navigation

@@ -30,6 +30,12 @@ If Chromium is already installed, use `make deps` followed by
 [website guide](scripts/site/README.md) for more options, asset provenance,
 and the production Caddy configuration.
 
+## Deploy
+
+On the web server, run `git pull`, then `make deploy`. It checks the content and
+publishes `site/` to `/var/www/comfyware` (set `DEPLOY_DIR` to change it), removing
+anything no longer in `site/`. Use `DRY_RUN=1 make deploy` to preview.
+
 ## Repository layout
 
 - `site/`: the complete public website; serve only this directory.
