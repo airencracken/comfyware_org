@@ -4,7 +4,10 @@ A comfortable little robot in a plain sage-green sweater, curled into a cream
 armchair with a terracotta mug of coffee. The chosen version has a smooth head
 without an antenna, simple feet and joints, open oval eyes, and a small smile.
 
-- Current asset: `site/assets/comfy-robot.png` (1254 × 1254, transparent RGBA PNG).
+- Original artwork: `design/mascot/comfy-robot-original.png` (1254 × 1254,
+  transparent RGBA PNG).
+- Public assets: `site/assets/comfy-robot.webp` (680 × 680, homepage) and
+  `site/assets/comfy-robot.png` (680 × 680, social previews).
 - Edited with the built-in `image_gen` tool on 2026-09-28.
 - Edit target: `site/assets/comfy-robot.png` at commit
   `ef931f9c27acf8bcd50a2d1851c1365e3e4a8f86`. The prior version and edit prompt
@@ -15,11 +18,23 @@ without an antenna, simple feet and joints, open oval eyes, and a small smile.
   [concept notes](../design/mascot-options/README.md).
 - This pass removes the antenna and reduces sweater ribbing, mechanical joints,
   and small shading details while retaining the selected expression and pose.
-- The generated PNG is copied unchanged, preserving its alpha channel. No CLI
-  fallback or image post-processing was used.
-- Used in the homepage introduction, homepage sharing metadata, and every page's
-  favicon. The favicon reuses the original transparent PNG. Earlier
-  concepts are kept outside the public site under `design/mascot-options/`.
+- The generated original is preserved unchanged outside the public site.
+  The public derivatives are resized and compressed, retaining transparency.
+  Separate small PNGs supply the favicon and Apple touch icon. Earlier concepts
+  are kept under `design/mascot-options/`.
+
+To regenerate the public images with ImageMagick:
+
+```sh
+magick design/mascot/comfy-robot-original.png -resize 680x680 -strip \
+  -define webp:method=6 -quality 75 site/assets/comfy-robot.webp
+magick design/mascot/comfy-robot-original.png -resize 680x680 -strip \
+  -colors 256 -define png:compression-level=9 site/assets/comfy-robot.png
+```
+
+The download budgets are 45,000 bytes for the homepage WebP and 100,000 bytes
+for the social PNG. Content and browser checks enforce these limits and verify
+that both assets decode at the intended size with transparent margins.
 
 ## Final edit prompt
 

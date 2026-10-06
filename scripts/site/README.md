@@ -125,11 +125,11 @@ Screenshots are copied, unmodified, from the projects' demo/test screenshots:
 
 They contain sample media and conversations, not a live community. The house mark
 is an SVG drawn for this site. `assets/comfy-robot.png` is the site's comfy robot
-mascot, also used directly as the favicon on every page. It was generated with
-the built-in image tool, taking inspiration from
-Imvault's keeper and Witmoot's Moot Knight, then edited to simplify its shapes and
-soften its expression. Its transparent PNG is preserved as generated; see the
-[mascot prompt and provenance](../../docs/mascot.md). Earlier concepts are kept
-under `design/mascot-options/`, outside the public website.
+mascot's social preview; the homepage uses its smaller WebP derivative. Both
+are 680 × 680 with transparency, with download budgets checked in CI. Separate
+small PNGs supply the favicon and Apple touch icon. The original generated
+artwork is preserved outside the public site; see the
+[mascot prompt, provenance, and compression commands](../../docs/mascot.md).
+Earlier concepts are kept under `design/mascot-options/`.
 Website code and these project assets use the repository's AGPL-3.0-or-later
 license; see the root `LICENSE`.

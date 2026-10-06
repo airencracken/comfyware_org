@@ -18,9 +18,9 @@ ROUTES = {"/": "index.html", "/imvault/": "imvault/index.html",
           "/witmoot/": "witmoot/index.html", "/principles/": "principles/index.html",
           "/404.html": "404.html"}
 NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/principles/", "Principles"), ("/#sponsor", "Sponsor")]
-# Bytes a visitor downloads for one page image; the original mascot is only an
-# Open Graph preview.
+# Bytes a visitor or social preview crawler downloads for one image.
 IMAGE_BUDGET = 200_000
+MASCOT_BUDGETS = {"assets/comfy-robot.webp": 45_000, "assets/comfy-robot.png": 100_000}
 ICON_BUDGET = 64_000
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
 
@@ -104,6 +104,16 @@ def validate_site(root):
         if len(doc.ids) != len(set(doc.ids)):
             errors.append(f"{route}: Duplicate IDs")
         names = {tag.get("name"): tag.get("content") for tag in doc.tags["meta"]}
+        for meta in doc.tags["meta"]:
+            if meta.get("property") != "og:image":
+                continue
+            url = urlsplit(meta.get("content", ""))
+            path = root / unquote(url.path).lstrip("/")
+            if (url.scheme != "https" or url.netloc != "comfyware.org"
+                    or not path.resolve().is_relative_to(root.resolve()) or not path.is_file()):
+                errors.append(f"{route}: Broken social preview image")
+            elif image_size(path) is None or path.stat().st_size > IMAGE_BUDGET:
+                errors.append(f"{route}: Oversized or invalid social preview image")
         if not names.get("description") or "width=device-width" not in names.get("viewport", ""):
             errors.append(f"{route}: Missing description or responsive viewport")
         canonical = [tag.get("href") for tag in doc.tags["link"] if tag.get("rel") == "canonical"]
@@ -183,6 +193,10 @@ def validate_site(root):
                 if url.fragment and (target not in documents or unquote(url.fragment) not in documents[target].ids):
                     errors.append(f"{route}: Broken fragment: {ref}")
 
+    for relative, budget in MASCOT_BUDGETS.items():
+        path = root / relative
+        if not path.is_file() or path.stat().st_size > budget:
+            errors.append(f"Mascot exceeds download budget: {relative}")
     css = (root / "assets/site.css").read_text()
     if re.search(r"@import\b|url\s*\(", css, re.I):
         errors.append("CSS must use only the bundled assets and system fonts")
@@ -232,7 +246,9 @@ class SiteContractTests(unittest.TestCase):
             ('<a class="button secondary" href="https://ko-fi.com/airencracken">', '<a class="button secondary" href="/principles/">',
              "Expected the Ko-fi link only"),
             ('href="/assets/favicon-64.png"', 'href="/assets/comfy-robot.png"', "Missing mascot favicon"),
-            ('src="/assets/comfy-robot.webp" width="680"', 'src="/assets/comfy-robot.png" width="1254"', "Oversized image"),
+            ('content="https://comfyware.org/assets/comfy-robot.png"', 'content="https://comfyware.org/assets/missing.png"', "Broken social preview image"),
+            ('content="https://comfyware.org/assets/comfy-robot.png"', 'content="https://example.com/robot.png"', "Broken social preview image"),
+            ('content="https://comfyware.org/assets/comfy-robot.png"', 'content="https://comfyware.org/%2e%2e/README.md"', "Broken social preview image"),
             ('width="680"', 'width="681"', "Incorrect image dimensions"),
             ('<a href="/principles/">Principles</a><a href="/#sponsor">', '<a href="/#sponsor">', "Navigation differs"),
             ('<a href="/witmoot/">Witmoot</a><a href="/principles/">', '<a href="/witmoot/" aria-current="page">Witmoot</a><a href="/principles/">', "Navigation differs"),
@@ -253,6 +269,19 @@ class SiteContractTests(unittest.TestCase):
                 self.assertIn(old, path.read_text())
                 path.write_text(path.read_text().replace(old, new, 1))
                 self.assertTrue(any(expected in error for error in validate_site(root)))
+
+    def test_mascot_budgets_reject_regressions_at_the_boundary(self):
+        for relative, budget in MASCOT_BUDGETS.items():
+            with self.subTest(asset=relative), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory) / "site"
+                shutil.copytree(SITE, root)
+                path = root / relative
+                original = path.read_bytes()
+                self.assertEqual(image_size(path), (680, 680))
+                for size in (budget, budget + 1):
+                    path.write_bytes(original + bytes(size - len(original)))
+                    self.assertEqual(any("Mascot exceeds download budget" in error
+                                         for error in validate_site(root)), size > budget)
 
 
 class ImageSizeTests(unittest.TestCase):

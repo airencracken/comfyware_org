@@ -85,6 +85,7 @@ class HTTPContractTests(unittest.TestCase):
 
     def test_assets_and_content_types(self):
         assets = {"/assets/site.css": "text/css", "/assets/theme.js": "text/javascript", "/assets/mark.svg": "image/svg+xml", "/assets/comfy-robot.png": "image/png",
+                  "/assets/comfy-robot.webp": "image/webp",
                   "/assets/imvault-gallery.png": "image/png", "/assets/witmoot-board.png": "image/png"}
         for route, mime in assets.items():
             with self.subTest(route=route):

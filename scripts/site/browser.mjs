@@ -43,6 +43,26 @@ server.serve_forever()
     base = `http://127.0.0.1:${port}`;
   }
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM || undefined });
+  const assetPage = await browser.newPage();
+  await assetPage.goto(base);
+  for (const [asset, budget] of [['comfy-robot.webp', 45000], ['comfy-robot.png', 100000]]) {
+    const result = await assetPage.evaluate(async asset => {
+      const response = await fetch(`/assets/${asset}`);
+      const blob = await response.blob();
+      const image = await createImageBitmap(blob);
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(image, 0, 0);
+      return { ok: response.ok, bytes: blob.size, width: image.width, height: image.height,
+        corner: ctx.getImageData(0, 0, 1, 1).data[3], center: ctx.getImageData(340, 340, 1, 1).data[3] };
+    }, asset);
+    check(result.ok && result.bytes <= budget, `${asset}: download budget`);
+    check(result.width === 680 && result.height === 680, `${asset}: decodes at intended resolution`);
+    check(result.corner === 0 && result.center >= 250, `${asset}: transparent margin and visible artwork`);
+  }
+  await assetPage.close();
   if (screenshotDir) await mkdir(screenshotDir, { recursive: true });
   for (const colorScheme of ['light', 'dark']) {
     for (const width of [320, 390, 768, 1440]) {
