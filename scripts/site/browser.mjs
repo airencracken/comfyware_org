@@ -129,7 +129,7 @@ server.serve_forever()
   check(new URL(page.url()).pathname === '/', 'Home navigation works without JavaScript');
   await page.getByRole('link', { name: 'Meet Songstead' }).click();
   check(new URL(page.url()).pathname === '/songstead/', 'Songstead navigation works without JavaScript');
-  check(await page.getByText('Songstead · Music recommendations · 0.2.0', { exact: false }).count() > 0, 'Songstead release version is visible');
+  check(await page.getByText('Songstead · Music recommendations · 0.2.1', { exact: false }).count() > 0, 'Songstead release version is visible');
   const privacyQuestion = page.getByText('Who can see what I share?', { exact: true });
   await privacyQuestion.focus();
   await page.keyboard.press('Enter');

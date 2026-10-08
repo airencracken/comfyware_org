@@ -25,8 +25,8 @@ class SongsteadTests(unittest.TestCase):
     def test_released_companion_album_discussions_preserve_privacy(self):
         album=(SITE / "imvault/index.html").read_text()
         board=(SITE / "witmoot/index.html").read_text()
-        self.assertIn("Imvault 0.16.1", album)
-        self.assertIn("Witmoot 0.14.1", board)
+        self.assertIn("Imvault 0.16.2", album)
+        self.assertIn("Witmoot 0.14.2", board)
         for page in (album, board):
             self.assertNotIn("next prepared release", page)
             self.assertIn("Private albums" if page == album else "private albums", page)
@@ -38,8 +38,8 @@ class SongsteadTests(unittest.TestCase):
         home = (SITE / "index.html").read_text()
         product = (SITE / "songstead/index.html").read_text()
         self.assertIn('href="/songstead/"', home)
-        self.assertIn("0.2.0", home)
-        self.assertIn("0.2.0", product)
+        self.assertIn("0.2.1", home)
+        self.assertIn("0.2.1", product)
         self.assertIn("AGPL-3.0-or-later", product)
         self.assertIn("master", product)
         self.assertIn("optional Bubblewrap support", product)

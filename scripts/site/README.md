@@ -123,8 +123,8 @@ Screenshots are copied, unmodified, from the projects' demo/test screenshots:
 - `assets/witmoot-board.png`: `witmoot/docs/images/board.png` at
   `8f20e2f26bf594394526ee7f6a558f013fd3c47b` (0.7.2).
 
-- `assets/songstead-recent.png`: captured from Songstead 0.2.0 at
-  `d4860f4`, with four fictional music
+- `assets/songstead-recent.png`: captured from Songstead 0.2.1 at
+  `925ccfd`, with four fictional music
   recommendations and three disposable demo accounts. To reproduce it after
   `make deps`, run `SONGSTEAD_BINARY=/path/to/songstead CHROMIUM=/usr/bin/chromium node scripts/site/capture-songstead.mjs`.
   The script creates a temporary database, uses local HTTP only, blocks external
