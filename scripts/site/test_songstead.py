@@ -19,14 +19,14 @@ class SongsteadTests(unittest.TestCase):
                        "Comments are conversation with the recommendation's audience.",
                        "You choose where to post in Witmoot."):
             self.assertIn(phrase, product)
-        self.assertEqual(product.count("<details>"), 3)
-        self.assertEqual(product.count("<summary>"), 3)
+        self.assertEqual(product.count("<details>"), 4)
+        self.assertEqual(product.count("<summary>"), 4)
 
     def test_released_companion_album_discussions_preserve_privacy(self):
         album=(SITE / "imvault/index.html").read_text()
         board=(SITE / "witmoot/index.html").read_text()
-        self.assertIn("Imvault 0.16.0", album)
-        self.assertIn("Witmoot 0.14.0", board)
+        self.assertIn("Imvault 0.16.1", album)
+        self.assertIn("Witmoot 0.14.1", board)
         for page in (album, board):
             self.assertNotIn("next prepared release", page)
             self.assertIn("Private albums" if page == album else "private albums", page)
@@ -38,8 +38,8 @@ class SongsteadTests(unittest.TestCase):
         home = (SITE / "index.html").read_text()
         product = (SITE / "songstead/index.html").read_text()
         self.assertIn('href="/songstead/"', home)
-        self.assertIn("0.1.2", home)
-        self.assertIn("0.1.2", product)
+        self.assertIn("0.2.0", home)
+        self.assertIn("0.2.0", product)
         self.assertIn("AGPL-3.0-or-later", product)
         self.assertIn("master", product)
         self.assertIn("optional Bubblewrap support", product)
@@ -60,6 +60,11 @@ class SongsteadTests(unittest.TestCase):
         document = Document(product)
         self.assertEqual([entry for entry in document.nav if entry[2] == "page"],
                          [["/songstead/", "Songstead", "page"]])
+
+    def test_administration_and_invitation_copy_matches_available_features(self):
+        product = (SITE / "songstead/index.html").read_text()
+        for text in ("invitation-only by default", "expiry and use limits", "Witmoot addresses", "one-hour recovery links", "same boundaries around private recommendations", "docs/administration.md"):
+            self.assertIn(text, product)
 
     def test_real_screenshot_is_linked_with_correct_dimensions(self):
         for path in ("index.html", "songstead/index.html"):
