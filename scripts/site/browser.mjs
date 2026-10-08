@@ -118,7 +118,7 @@ server.serve_forever()
   check(new URL(page.url()).pathname === '/', 'Home navigation works without JavaScript');
   await page.getByRole('link', { name: 'Meet Songstead' }).click();
   check(new URL(page.url()).pathname === '/songstead/', 'Songstead navigation works without JavaScript');
-  check(await page.getByText('In development', { exact: false }).count() > 0, 'Songstead development status is visible');
+  check(await page.getByText('0.1.0 in preparation', { exact: false }).count() > 0, 'Songstead release preparation status is visible');
   await page.getByRole('link', { name: 'Comfyware home' }).click();
   await page.getByRole('link', { name: 'Read the Comfyware principles' }).click();
   check(new URL(page.url()).origin === new URL(base).origin && new URL(page.url()).pathname === '/principles/', 'Principles open as a page on this site without JavaScript');
