@@ -9,17 +9,32 @@ from test_content import Document, SITE, validate_site
 
 
 class SongsteadTests(unittest.TestCase):
-    def test_companion_album_discussions_are_labelled_prepared_and_private(self):
+    def test_privacy_questions_explain_audiences_and_deliberate_participation(self):
+        product = (SITE / "songstead/index.html").read_text()
+        for phrase in ("Who can see what I share?", "There is no anonymous feed.",
+                       "current members of its group", "Does Recent fill my shelf?",
+                       "Opening a recommendation changes nothing.",
+                       "when you choose to organize it or comment on it",
+                       "Can my friends see my listening notes?",
+                       "Comments are conversation with the recommendation's audience.",
+                       "You choose where to post in Witmoot."):
+            self.assertIn(phrase, product)
+        self.assertEqual(product.count("<details>"), 3)
+        self.assertEqual(product.count("<summary>"), 3)
+
+    def test_released_companion_album_discussions_preserve_privacy(self):
         album=(SITE / "imvault/index.html").read_text()
         board=(SITE / "witmoot/index.html").read_text()
-        for page in (album,board):
-            self.assertIn("next prepared release",page)
-            self.assertIn("Private albums" if page == album else "private albums",page)
+        self.assertIn("Imvault 0.16.0", album)
+        self.assertIn("Witmoot 0.14.0", board)
+        for page in (album, board):
+            self.assertNotIn("next prepared release", page)
+            self.assertIn("Private albums" if page == album else "private albums", page)
         self.assertIn("Threads are never created automatically",album)
         self.assertIn("Choose a board or an existing topic",board)
         self.assertIn("on request",board)
 
-    def test_project_is_discoverable_with_honest_release_preparation(self):
+    def test_released_project_exposes_source_downloads_and_installation(self):
         home = (SITE / "index.html").read_text()
         product = (SITE / "songstead/index.html").read_text()
         self.assertIn('href="/songstead/"', home)
@@ -29,19 +44,22 @@ class SongsteadTests(unittest.TestCase):
         self.assertIn("master", product)
         self.assertIn("no streaming account or playback tracking", product)
         self.assertIn("a gift, never an assignment", product)
-        self.assertIn("when the repository and release are available", product)
+        self.assertNotIn("in preparation", product)
         self.assertIn("does not host or stream music", product)
         self.assertIn("Recent shows what people shared with everyone here", product)
         self.assertIn("Private recommendations stay out", product)
         self.assertIn("Your shelf", product)
         self.assertNotIn("inbox", product.lower())
-        self.assertNotIn("/songstead/releases", product)
-        self.assertNotIn("/songstead/blob/master", product)
+        self.assertIn('href="https://github.com/airencracken/songstead"', product)
+        self.assertIn('href="https://github.com/airencracken/songstead/releases/latest"', product)
+        self.assertIn('href="https://github.com/airencracken/songstead/blob/master/docs/releases.md"', product)
+        self.assertIn('href="https://github.com/airencracken/songstead/blob/master/docs/deployment.md"', product)
+        self.assertNotIn("in preparation", home)
         document = Document(product)
         self.assertEqual([entry for entry in document.nav if entry[2] == "page"],
                          [["/songstead/", "Songstead", "page"]])
 
-    def test_browser_status_check_matches_visible_preparation_copy(self):
+    def test_browser_status_check_matches_visible_release_copy(self):
         browser=(SITE.parent / "scripts/site/browser.mjs").read_text()
         matches=re.findall(r"getByText\('([^']*0\.1\.0[^']*)'",browser)
         self.assertEqual(len(matches),1)
@@ -57,12 +75,15 @@ class SongsteadTests(unittest.TestCase):
 
     def test_malformed_canonical_and_injected_content_are_rejected(self):
         for old, new in [('https://comfyware.org/songstead/', 'https://example.org/songstead/'),
-                         ('<body>', '<body onload="alert(1)">')]:
+                         ('<body', '<body onload="alert(1)"')]:
             with tempfile.TemporaryDirectory() as directory:
                 root = Path(directory) / "site"
                 shutil.copytree(SITE, root)
                 page = root / "songstead/index.html"
-                page.write_text(page.read_text().replace(old, new, 1))
+                original = page.read_text()
+                mutated = original.replace(old, new, 1)
+                self.assertNotEqual(original, mutated, "Mutation did not apply")
+                page.write_text(mutated)
                 self.assertTrue(validate_site(root))
 
 

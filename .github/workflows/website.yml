@@ -10,6 +10,11 @@ on:
 permissions:
   contents: read
 
+# Commands handle errors explicitly.
+defaults:
+  run:
+    shell: bash --noprofile --norc {0}
+
 jobs:
   website:
     runs-on: ubuntu-24.04

@@ -211,7 +211,7 @@ def validate_site(root):
 
 class SiteContractTests(unittest.TestCase):
     def test_product_pages_expose_installation_and_release_routes(self):
-        for app in ("imvault", "witmoot"):
+        for app in ("imvault", "witmoot", "songstead"):
             with self.subTest(app=app):
                 doc = Document((SITE / app / "index.html").read_text())
                 links = {a.get("href") for a in doc.tags["a"]}

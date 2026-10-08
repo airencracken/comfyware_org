@@ -80,6 +80,13 @@ server.serve_forever()
         });
         check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${route}: overflow at ${width}px`);
         check(await page.locator('h1').count() === 1, `${route}: one main heading`);
+        if (route === '/' || route === '/songstead/') {
+          const artwork = await page.locator('img[src="/assets/songstead-jukebox.png"]').evaluate(image => {
+            const box = image.getBoundingClientRect();
+            return { width: box.width, height: box.height, fit: getComputedStyle(image).objectFit };
+          });
+          check(artwork.width > 0 && artwork.width <= 240 && Math.abs(artwork.width - artwork.height) < 1 && artwork.fit === 'contain', `${route}: complete square Songstead artwork at ${width}px`);
+        }
         const accessibility = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice']).analyze();
         assert.deepEqual(accessibility.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) })), [], `${route}: ${colorScheme} accessibility at ${width}px`);
         checks++;
@@ -118,7 +125,13 @@ server.serve_forever()
   check(new URL(page.url()).pathname === '/', 'Home navigation works without JavaScript');
   await page.getByRole('link', { name: 'Meet Songstead' }).click();
   check(new URL(page.url()).pathname === '/songstead/', 'Songstead navigation works without JavaScript');
-  check(await page.getByText('0.1.0 in preparation', { exact: false }).count() > 0, 'Songstead release preparation status is visible');
+  check(await page.getByText('Songstead · Music recommendations · 0.1.0', { exact: false }).count() > 0, 'Songstead release version is visible');
+  const privacyQuestion = page.getByText('Who can see what I share?', { exact: true });
+  await privacyQuestion.focus();
+  await page.keyboard.press('Enter');
+  check(await page.getByText('Everyone here means people signed in to your Songstead installation.', { exact: false }).isVisible(), 'Songstead audience explanation opens with the keyboard without JavaScript');
+  await page.keyboard.press('Enter');
+  check(!await page.getByText('Everyone here means people signed in to your Songstead installation.', { exact: false }).isVisible(), 'Songstead audience explanation closes with the keyboard');
   await page.getByRole('link', { name: 'Comfyware home' }).click();
   await page.getByRole('link', { name: 'Read the Comfyware principles' }).click();
   check(new URL(page.url()).origin === new URL(base).origin && new URL(page.url()).pathname === '/principles/', 'Principles open as a page on this site without JavaScript');
