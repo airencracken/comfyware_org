@@ -227,7 +227,7 @@ class SiteContractTests(unittest.TestCase):
         self.assertEqual({str(p.relative_to(SITE)) for p in SITE.rglob("*") if p.is_file()}, {
             *ROUTES.values(), "assets/site.css", "assets/theme.js", "assets/mark.svg", "assets/comfy-robot.png",
             "assets/comfy-robot.webp", "assets/favicon-64.png", "assets/apple-touch-icon.png", "assets/imvault-gallery.png",
-            "assets/witmoot-board.png", "assets/songstead-jukebox.png", "robots.txt", "sitemap.xml",
+            "assets/witmoot-board.png", "assets/songstead-jukebox.png", "assets/songstead-recent.png", "robots.txt", "sitemap.xml",
         })
 
     def test_mutations_are_rejected(self):

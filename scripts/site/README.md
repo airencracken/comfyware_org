@@ -123,6 +123,13 @@ Screenshots are copied, unmodified, from the projects' demo/test screenshots:
 - `assets/witmoot-board.png`: `witmoot/docs/images/board.png` at
   `8f20e2f26bf594394526ee7f6a558f013fd3c47b` (0.7.2).
 
+- `assets/songstead-recent.png`: captured from Songstead 0.1.0 at
+  `24cec0eb500b3f2b1c4ee4ab29a7813af95edd87`, with four fictional music
+  recommendations and three disposable demo accounts. To reproduce it after
+  `make deps`, run `SONGSTEAD_BINARY=/path/to/songstead CHROMIUM=/usr/bin/chromium node scripts/site/capture-songstead.mjs`.
+  The script creates a temporary database, uses local HTTP only, blocks external
+  browser requests, and deletes its demo data when it finishes.
+
 They contain sample media and conversations, not a live community. The house mark
 is an SVG drawn for this site. `assets/comfy-robot.png` is the site's comfy robot
 mascot's social preview; the homepage uses its smaller WebP derivative. Both

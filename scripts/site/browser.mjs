@@ -81,11 +81,15 @@ server.serve_forever()
         check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${route}: overflow at ${width}px`);
         check(await page.locator('h1').count() === 1, `${route}: one main heading`);
         if (route === '/' || route === '/songstead/') {
-          const artwork = await page.locator('img[src="/assets/songstead-jukebox.png"]').evaluate(image => {
+          const screenshot = await page.locator('img[src="/assets/songstead-recent.png"]').evaluate(image => {
             const box = image.getBoundingClientRect();
-            return { width: box.width, height: box.height, fit: getComputedStyle(image).objectFit };
+            return { width: box.width, height: box.height, naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight };
           });
-          check(artwork.width > 0 && artwork.width <= 240 && Math.abs(artwork.width - artwork.height) < 1 && artwork.fit === 'contain', `${route}: complete square Songstead artwork at ${width}px`);
+          check(screenshot.width > 0 && screenshot.naturalWidth === 1280 && screenshot.naturalHeight === 1721, `${route}: real Songstead screenshot at ${width}px`);
+          if (route === '/songstead/') {
+            check(Math.abs(screenshot.width / screenshot.height - 1280 / 1721) < 0.01, `Songstead screenshot preserves its full aspect ratio at ${width}px`);
+            check(await page.getByRole('link', { name: 'View the full Songstead screenshot' }).getAttribute('href') === '/assets/songstead-recent.png', 'Full screenshot link');
+          }
         }
         const accessibility = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice']).analyze();
         assert.deepEqual(accessibility.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) })), [], `${route}: ${colorScheme} accessibility at ${width}px`);
