@@ -8,13 +8,17 @@ from test_content import Document, SITE, validate_site
 
 
 class SongsteadTests(unittest.TestCase):
-    def test_project_is_discoverable_with_honest_development_status(self):
+    def test_project_is_discoverable_with_honest_release_preparation(self):
         home = (SITE / "index.html").read_text()
         product = (SITE / "songstead/index.html").read_text()
         self.assertIn('href="/songstead/"', home)
-        self.assertIn("In development", home)
-        self.assertIn("In development", product)
-        self.assertIn("two friends", product)
+        self.assertIn("0.1.0", home)
+        self.assertIn("0.1.0", product)
+        self.assertIn("AGPL-3.0-or-later", product)
+        self.assertIn("master", product)
+        self.assertIn("no streaming account or playback tracking", product)
+        self.assertIn("a gift, never an assignment", product)
+        self.assertIn("when the repository and release are available", product)
         self.assertIn("does not host or stream music", product)
         self.assertNotIn("/songstead/releases", product)
         self.assertNotIn("/songstead/blob/master", product)
