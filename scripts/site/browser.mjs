@@ -11,7 +11,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { checkThemes } from './themes.mjs';
 
 const root = fileURLToPath(new URL('../../site/', import.meta.url));
-const routes = ['/', '/imvault/', '/witmoot/', '/principles/', '/404.html'];
+const routes = ['/', '/imvault/', '/witmoot/', '/songstead/', '/principles/', '/404.html'];
 const screenshotDir = process.env.SCREENSHOT_DIR;
 let server;
 let browser;
@@ -116,6 +116,10 @@ server.serve_forever()
   check(new URL(page.url()).pathname === '/witmoot/', 'Cross-project navigation works without JavaScript');
   await page.getByRole('link', { name: 'Comfyware home' }).click();
   check(new URL(page.url()).pathname === '/', 'Home navigation works without JavaScript');
+  await page.getByRole('link', { name: 'Meet Songstead' }).click();
+  check(new URL(page.url()).pathname === '/songstead/', 'Songstead navigation works without JavaScript');
+  check(await page.getByText('In development', { exact: false }).count() > 0, 'Songstead development status is visible');
+  await page.getByRole('link', { name: 'Comfyware home' }).click();
   await page.getByRole('link', { name: 'Read the Comfyware principles' }).click();
   check(new URL(page.url()).origin === new URL(base).origin && new URL(page.url()).pathname === '/principles/', 'Principles open as a page on this site without JavaScript');
   check(await page.getByRole('heading', { name: 'Local sovereignty', exact: true }).count() === 1, 'The principles page contains the full principles');

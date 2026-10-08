@@ -1,6 +1,6 @@
 # comfyware_org
 
-The website for **comfyware.org**: a home for Imvault, Witmoot, and the Comfyware
+The website for **comfyware.org**: a home for Imvault, Witmoot, Songstead, and the Comfyware
 approach to software for friends, family, and small communities.
 
 Plain HTML and CSS, with local screenshots, system fonts, and a small optional

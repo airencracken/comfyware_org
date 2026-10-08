@@ -16,8 +16,8 @@ SITE = Path(__file__).resolve().parents[2] / "site"
 ORIGIN = "https://comfyware.org"
 ROUTES = {"/": "index.html", "/imvault/": "imvault/index.html",
           "/witmoot/": "witmoot/index.html", "/principles/": "principles/index.html",
-          "/404.html": "404.html"}
-NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/principles/", "Principles"), ("/#sponsor", "Sponsor")]
+          "/songstead/": "songstead/index.html", "/404.html": "404.html"}
+NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/songstead/", "Songstead"), ("/principles/", "Principles"), ("/#sponsor", "Sponsor")]
 # Bytes a visitor or social preview crawler downloads for one image.
 IMAGE_BUDGET = 200_000
 MASCOT_BUDGETS = {"assets/comfy-robot.webp": 45_000, "assets/comfy-robot.png": 100_000}
@@ -134,7 +134,7 @@ def validate_site(root):
             path = root / icon.get("href", "").lstrip("/")
             if path.is_file() and path.stat().st_size > ICON_BUDGET:
                 errors.append(f"{route}: Oversized icon: {icon['href']}")
-        current = {"/imvault/": "/imvault/", "/witmoot/": "/witmoot/", "/principles/": "/principles/"}.get(route)
+        current = {"/imvault/": "/imvault/", "/witmoot/": "/witmoot/", "/principles/": "/principles/", "/songstead/": "/songstead/"}.get(route)
         expected_nav = [[href, text, "page" if href == current else None] for href, text in NAV]
         if doc.nav != expected_nav:
             errors.append(f"{route}: Navigation differs from the other pages")
@@ -227,7 +227,7 @@ class SiteContractTests(unittest.TestCase):
         self.assertEqual({str(p.relative_to(SITE)) for p in SITE.rglob("*") if p.is_file()}, {
             *ROUTES.values(), "assets/site.css", "assets/theme.js", "assets/mark.svg", "assets/comfy-robot.png",
             "assets/comfy-robot.webp", "assets/favicon-64.png", "assets/apple-touch-icon.png", "assets/imvault-gallery.png",
-            "assets/witmoot-board.png", "robots.txt", "sitemap.xml",
+            "assets/witmoot-board.png", "assets/songstead-jukebox.png", "robots.txt", "sitemap.xml",
         })
 
     def test_mutations_are_rejected(self):
@@ -251,7 +251,7 @@ class SiteContractTests(unittest.TestCase):
             ('content="https://comfyware.org/assets/comfy-robot.png"', 'content="https://comfyware.org/%2e%2e/README.md"', "Broken social preview image"),
             ('width="680"', 'width="681"', "Incorrect image dimensions"),
             ('<a href="/principles/">Principles</a><a href="/#sponsor">', '<a href="/#sponsor">', "Navigation differs"),
-            ('<a href="/witmoot/">Witmoot</a><a href="/principles/">', '<a href="/witmoot/" aria-current="page">Witmoot</a><a href="/principles/">', "Navigation differs"),
+            ('<a href="/witmoot/">Witmoot</a><a href="/songstead/">Songstead</a><a href="/principles/">', '<a href="/witmoot/" aria-current="page">Witmoot</a><a href="/songstead/">Songstead</a><a href="/principles/">', "Navigation differs"),
             ('value="dark"', 'value="unexpected"', "Invalid theme choices"),
             ('class="theme-picker" hidden', 'class="theme-picker"', "Theme control must start hidden"),
             ('<body>', '<body onload="alert(1)">', "Inline code"),
