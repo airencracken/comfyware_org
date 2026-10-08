@@ -38,10 +38,12 @@ class SongsteadTests(unittest.TestCase):
         home = (SITE / "index.html").read_text()
         product = (SITE / "songstead/index.html").read_text()
         self.assertIn('href="/songstead/"', home)
-        self.assertIn("0.1.0", home)
-        self.assertIn("0.1.0", product)
+        self.assertIn("0.1.1", home)
+        self.assertIn("0.1.1", product)
         self.assertIn("AGPL-3.0-or-later", product)
         self.assertIn("master", product)
+        self.assertIn("optional Bubblewrap support", product)
+        self.assertIn('href="https://github.com/airencracken/songstead/blob/master/docs/sandbox.md"', product)
         self.assertIn("no streaming account or playback tracking", product)
         self.assertIn("a gift, never an assignment", product)
         self.assertNotIn("in preparation", product)
@@ -82,7 +84,7 @@ class SongsteadTests(unittest.TestCase):
 
     def test_browser_status_check_matches_visible_release_copy(self):
         browser=(SITE.parent / "scripts/site/browser.mjs").read_text()
-        matches=re.findall(r"getByText\('([^']*0\.1\.0[^']*)'",browser)
+        matches=re.findall(r"getByText\('([^']*0\.1\.1[^']*)'",browser)
         self.assertEqual(len(matches),1)
         self.assertIn(matches[0],(SITE / "songstead/index.html").read_text())
 
