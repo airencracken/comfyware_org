@@ -26,7 +26,7 @@ class SongsteadTests(unittest.TestCase):
         album=(SITE / "imvault/index.html").read_text()
         board=(SITE / "witmoot/index.html").read_text()
         self.assertIn("Imvault 0.16.2", album)
-        self.assertIn("Witmoot 0.14.2", board)
+        self.assertIn("Witmoot 0.15.0", board)
         for page in (album, board):
             self.assertNotIn("next prepared release", page)
             self.assertIn("Private albums" if page == album else "private albums", page)

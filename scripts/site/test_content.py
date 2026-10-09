@@ -220,6 +220,11 @@ class SiteContractTests(unittest.TestCase):
                 self.assertIn(origin + "/blob/master/docs/releases.md", links)
                 self.assertIn(origin + "/blob/master/docs/deployment.md", links)
 
+    def test_witmoot_avatar_settings_are_documented(self):
+        text = (SITE / "witmoot/index.html").read_text()
+        for phrase in ("Witmoot 0.15.0", "profile picture", "Animated GIFs", "account settings", "reduced-motion", "still pictures"):
+            self.assertIn(phrase, text)
+
     def test_public_site_contract(self):
         self.assertEqual(validate_site(SITE), [])
 
