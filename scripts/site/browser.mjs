@@ -85,9 +85,9 @@ server.serve_forever()
             const box = image.getBoundingClientRect();
             return { width: box.width, height: box.height, naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight };
           });
-          check(screenshot.width > 0 && screenshot.naturalWidth === 1280 && screenshot.naturalHeight === 1245, `${route}: real Songstead screenshot at ${width}px`);
+          check(screenshot.width > 0 && screenshot.naturalWidth === 1280 && screenshot.naturalHeight === 1228, `${route}: real Songstead screenshot at ${width}px`);
           if (route === '/songstead/') {
-            check(Math.abs(screenshot.width / screenshot.height - 1280 / 1245) < 0.01, `Songstead screenshot preserves its full aspect ratio at ${width}px`);
+            check(Math.abs(screenshot.width / screenshot.height - 1280 / 1228) < 0.01, `Songstead screenshot preserves its full aspect ratio at ${width}px`);
             check(await page.getByRole('link', { name: 'View the full Songstead screenshot' }).getAttribute('href') === '/assets/songstead-recent.png', 'Full screenshot link');
           }
         }
@@ -129,7 +129,7 @@ server.serve_forever()
   check(new URL(page.url()).pathname === '/', 'Home navigation works without JavaScript');
   await page.getByRole('link', { name: 'Meet Songstead' }).click();
   check(new URL(page.url()).pathname === '/songstead/', 'Songstead navigation works without JavaScript');
-  check(await page.getByText('Songstead · Music recommendations · 0.4.0', { exact: false }).count() > 0, 'Songstead release version is visible');
+  check(await page.getByText('Songstead · Music recommendations · 0.4.1', { exact: false }).count() > 0, 'Songstead release version is visible');
   const privacyQuestion = page.getByText('Who can see what I share?', { exact: true });
   await privacyQuestion.focus();
   await page.keyboard.press('Enter');

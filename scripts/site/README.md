@@ -123,10 +123,10 @@ Screenshots are copied, unmodified, from the projects' demo/test screenshots:
 - `assets/witmoot-board.png`: `witmoot/docs/images/board.png` at
   `8f20e2f26bf594394526ee7f6a558f013fd3c47b` (0.7.2).
 
-- `assets/songstead-recent.png`: captured from Songstead 0.4.0 at
-  `31a05a5`, with four fictional music
+- `assets/songstead-recent.png`: captured from Songstead 0.4.1 at
+  `bd2c157`, with four fictional music
   recommendations, local sample artwork and three disposable demo accounts.
-  It shows the optional tile layout; chips remains the application default. To reproduce it after
+  It shows the optional tile layout; List remains the application default. To reproduce it after
   `make deps`, run `SONGSTEAD_BINARY=/path/to/songstead CHROMIUM=/usr/bin/chromium node scripts/site/capture-songstead.mjs`.
   The script creates a temporary database, uses local HTTP only, blocks external
   browser requests, and deletes its demo data when it finishes.
