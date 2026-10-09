@@ -38,8 +38,8 @@ class SongsteadTests(unittest.TestCase):
         home = (SITE / "index.html").read_text()
         product = (SITE / "songstead/index.html").read_text()
         self.assertIn('href="/songstead/"', home)
-        self.assertIn("0.2.1", home)
-        self.assertIn("0.2.1", product)
+        self.assertIn("0.3.1", home)
+        self.assertIn("0.3.1", product)
         self.assertIn("AGPL-3.0-or-later", product)
         self.assertIn("master", product)
         self.assertIn("optional Bubblewrap support", product)
@@ -66,25 +66,34 @@ class SongsteadTests(unittest.TestCase):
         for text in ("invitation-only by default", "expiry and use limits", "Witmoot addresses", "one-hour recovery links", "same boundaries around private recommendations", "docs/administration.md"):
             self.assertIn(text, product)
 
+    def test_discovery_copy_matches_the_available_controls(self):
+        product = (SITE / "songstead/index.html").read_text()
+        for text in ("freeform genre and tags", "privately exclude genres or tags", "Exclusions take priority.", "Chips or Tiles", "cached locally", "confirmation beside the form", "descriptions on a private send stay inside that send", "Open Account"):
+            self.assertIn(text, product)
+        capture = (SITE.parent / "scripts/site/capture-songstead.mjs").read_text()
+        self.assertIn("layout=tiles", capture)
+        self.assertIn(".artwork-placeholder", capture)
+        self.assertIn("media_artwork", capture)
+
     def test_real_screenshot_is_linked_with_correct_dimensions(self):
         for path in ("index.html", "songstead/index.html"):
             document = Document((SITE / path).read_text())
             screenshots = [tag for tag in document.tags["img"] if tag.get("src") == "/assets/songstead-recent.png"]
             self.assertEqual(len(screenshots), 1)
-            self.assertEqual((screenshots[0]["width"], screenshots[0]["height"]), ("1280", "1721"))
+            self.assertEqual((screenshots[0]["width"], screenshots[0]["height"]), ("1280", "1183"))
             self.assertIn("recommendations", screenshots[0]["alt"])
             self.assertFalse(any(tag.get("src") == "/assets/songstead-jukebox.png" for tag in document.tags["img"]))
         product = (SITE / "songstead/index.html").read_text()
         self.assertIn('class="screenshot"', product)
         self.assertIn('href="/assets/songstead-recent.png"', product)
-        self.assertIn("fictional music and demo accounts", product)
+        self.assertIn("fictional music, local sample artwork and demo accounts", product)
 
     def test_wrong_screenshot_dimensions_fail_validation(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / "site"
             shutil.copytree(SITE, root)
             page = root / "songstead/index.html"
-            page.write_text(page.read_text().replace('height="1721"', 'height="480"'))
+            page.write_text(page.read_text().replace('height="1183"', 'height="480"'))
             self.assertTrue(validate_site(root))
 
     def test_browser_status_check_matches_visible_release_copy(self):
