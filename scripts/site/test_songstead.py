@@ -38,8 +38,8 @@ class SongsteadTests(unittest.TestCase):
         home = (SITE / "index.html").read_text()
         product = (SITE / "songstead/index.html").read_text()
         self.assertIn('href="/songstead/"', home)
-        self.assertIn("0.4.1", home)
-        self.assertIn("0.4.1", product)
+        self.assertIn("0.5.0", home)
+        self.assertIn("0.5.0", product)
         self.assertIn("AGPL-3.0-or-later", product)
         self.assertIn("master", product)
         self.assertIn("optional Bubblewrap support", product)
@@ -63,7 +63,7 @@ class SongsteadTests(unittest.TestCase):
 
     def test_administration_and_invitation_copy_matches_available_features(self):
         product = (SITE / "songstead/index.html").read_text()
-        for text in ("invitation-only by default", "expiry and use limits", "Witmoot addresses", "one-hour recovery links", "same boundaries around private recommendations", "docs/administration.md"):
+        for text in ("invitation-only by default", "expiry and use limits", "Witmoot addresses", "one-hour recovery links", "same boundaries around private recommendations", "docs/administration.md", "Discussion location: Songstead, Witmoot or Both", "without a Witmoot account", "No API key is needed", "earlier local comments remain readable"):
             self.assertIn(text, product)
 
     def test_discovery_copy_matches_the_available_controls(self):
