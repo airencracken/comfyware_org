@@ -222,8 +222,15 @@ class SiteContractTests(unittest.TestCase):
 
     def test_witmoot_avatar_settings_are_documented(self):
         text = (SITE / "witmoot/index.html").read_text()
-        for phrase in ("Witmoot 0.15.0", "profile picture", "Animated GIFs", "account settings", "reduced-motion", "still pictures"):
+        for phrase in ("Witmoot 0.16.0", "profile picture", "Animated GIFs", "account settings", "reduced-motion", "still pictures"):
             self.assertIn(phrase, text)
+
+    def test_optional_member_profiles_are_documented_for_all_apps(self):
+        for app, settings in (("songstead", "Your settings"), ("witmoot", "Your account → Edit your profile"), ("imvault", "Settings → Account → Profile")):
+            with self.subTest(app=app):
+                text = (SITE / app / "index.html").read_text()
+                for phrase in (settings, "optional name", "short plain-text bio", "five labeled web links", "visible only to signed-in members", "Your username stays the same", "own account export", "Clear the fields"):
+                    self.assertIn(phrase, text)
 
     def test_public_site_contract(self):
         self.assertEqual(validate_site(SITE), [])
