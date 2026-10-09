@@ -21,7 +21,7 @@ let browser;
 try {
   const version = spawnSync(binary, ['--version'], { env: environment, encoding: 'utf8' });
   assert.equal(version.status, 0);
-  assert.equal(version.stdout.trim(), 'songstead 0.5.0');
+  assert.equal(version.stdout.trim(), 'songstead 0.6.0');
   for (const username of ['alice', 'bobby', 'carol']) {
     const result = spawnSync(binary, ['create-user', '--data-dir', directory, '--username', username, '--password-stdin'],
       { input: `${password}\n`, env: environment, encoding: 'utf8' });

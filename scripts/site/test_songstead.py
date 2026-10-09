@@ -9,6 +9,11 @@ from test_content import Document, SITE, validate_site
 
 
 class SongsteadTests(unittest.TestCase):
+    def test_recent_comments_discovery_preserves_privacy_and_spoilers(self):
+        text=(SITE / "songstead/index.html").read_text()
+        for phrase in ("Recent → Comments", "newest first", "exact comment", "Private sends", "spoiler preference", "listening positions", "Witmoot conversations stay on Witmoot"):
+            self.assertIn(phrase,text)
+
     def test_privacy_questions_explain_audiences_and_deliberate_participation(self):
         product = (SITE / "songstead/index.html").read_text()
         for phrase in ("Who can see what I share?", "There is no anonymous feed.",
@@ -38,8 +43,8 @@ class SongsteadTests(unittest.TestCase):
         home = (SITE / "index.html").read_text()
         product = (SITE / "songstead/index.html").read_text()
         self.assertIn('href="/songstead/"', home)
-        self.assertIn("0.5.0", home)
-        self.assertIn("0.5.0", product)
+        self.assertIn("0.6.0", home)
+        self.assertIn("0.6.0", product)
         self.assertIn("AGPL-3.0-or-later", product)
         self.assertIn("master", product)
         self.assertIn("optional Bubblewrap support", product)
@@ -80,7 +85,7 @@ class SongsteadTests(unittest.TestCase):
             document = Document((SITE / path).read_text())
             screenshots = [tag for tag in document.tags["img"] if tag.get("src") == "/assets/songstead-recent.png"]
             self.assertEqual(len(screenshots), 1)
-            self.assertEqual((screenshots[0]["width"], screenshots[0]["height"]), ("1280", "1228"))
+            self.assertEqual((screenshots[0]["width"], screenshots[0]["height"]), ("1280", "1289"))
             self.assertIn("recommendations", screenshots[0]["alt"])
             self.assertFalse(any(tag.get("src") == "/assets/songstead-jukebox.png" for tag in document.tags["img"]))
         product = (SITE / "songstead/index.html").read_text()
@@ -93,7 +98,7 @@ class SongsteadTests(unittest.TestCase):
             root = Path(directory) / "site"
             shutil.copytree(SITE, root)
             page = root / "songstead/index.html"
-            page.write_text(page.read_text().replace('height="1228"', 'height="480"'))
+            page.write_text(page.read_text().replace('height="1289"', 'height="480"'))
             self.assertTrue(validate_site(root))
 
     def test_browser_status_check_matches_visible_release_copy(self):
