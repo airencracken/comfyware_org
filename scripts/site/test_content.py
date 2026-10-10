@@ -232,6 +232,14 @@ class SiteContractTests(unittest.TestCase):
                 for phrase in (settings, "optional name", "short plain-text bio", "five labeled web links", "visible only to signed-in members", "Your username stays the same", "own account export", "Clear the fields"):
                     self.assertIn(phrase, text)
 
+    def test_search_and_imvault_avatar_privacy_are_documented(self):
+        music = (SITE / "songstead/index.html").read_text()
+        for phrase in ("Open Search", "private sends and groups", "Personal listening notes and ratings are never searched", "spoiler preference", "without JavaScript"):
+            self.assertIn(phrase, music)
+        photos = (SITE / "imvault/index.html").read_text()
+        for phrase in ("Imvault 0.18.0", "optional avatar", "without embedded metadata", "Show animated avatars", "reduced-motion", "visible only to signed-in members", "own pictures and animation preference"):
+            self.assertIn(phrase, photos)
+
     def test_public_site_contract(self):
         self.assertEqual(validate_site(SITE), [])
 

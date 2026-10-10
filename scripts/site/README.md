@@ -123,8 +123,8 @@ Screenshots are copied, unmodified, from the projects' demo/test screenshots:
 - `assets/witmoot-board.png`: `witmoot/docs/images/board.png` at
   `8f20e2f26bf594394526ee7f6a558f013fd3c47b` (0.7.2).
 
-- `assets/songstead-recent.png`: captured from Songstead 0.7.0 at
-  `ddd0d5e`, with four fictional music
+- `assets/songstead-recent.png`: captured from Songstead 0.8.0 at
+  `0f3d56f`, with four fictional music
   recommendations, local sample artwork and three disposable demo accounts.
   It shows the optional tile layout; List remains the application default. To reproduce it after
   `make deps`, run `SONGSTEAD_BINARY=/path/to/songstead CHROMIUM=/usr/bin/chromium node scripts/site/capture-songstead.mjs`.
