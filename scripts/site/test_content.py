@@ -222,7 +222,7 @@ class SiteContractTests(unittest.TestCase):
 
     def test_witmoot_avatar_settings_are_documented(self):
         text = (SITE / "witmoot/index.html").read_text()
-        for phrase in ("Witmoot 0.16.0", "profile picture", "Animated GIFs", "account settings", "reduced-motion", "still pictures"):
+        for phrase in ("Witmoot 0.17.0", "profile picture", "Animated GIFs", "account settings", "reduced-motion", "still pictures"):
             self.assertIn(phrase, text)
 
     def test_optional_member_profiles_are_documented_for_all_apps(self):
@@ -232,12 +232,19 @@ class SiteContractTests(unittest.TestCase):
                 for phrase in (settings, "optional name", "short plain-text bio", "five labeled web links", "visible only to signed-in members", "Your username stays the same", "own account export", "Clear the fields"):
                     self.assertIn(phrase, text)
 
+    def test_automatic_backups_are_described_for_each_app(self):
+        for app in ("songstead", "imvault", "witmoot"):
+            content = (SITE / app / "index.html").read_text()
+            for phrase in ("verified backups automatically", "zstd", "gzip", "seven copies", "configurable storage cap", "last success", "another machine", f"{app}/blob/master/docs/automatic-backups.md"):
+                with self.subTest(app=app, phrase=phrase):
+                    self.assertIn(phrase, content)
+
     def test_search_and_imvault_avatar_privacy_are_documented(self):
         music = (SITE / "songstead/index.html").read_text()
         for phrase in ("Open Search", "private sends and groups", "Personal listening notes and ratings are never searched", "spoiler preference", "without JavaScript"):
             self.assertIn(phrase, music)
         photos = (SITE / "imvault/index.html").read_text()
-        for phrase in ("Imvault 0.18.0", "optional avatar", "without embedded metadata", "Show animated avatars", "reduced-motion", "visible only to signed-in members", "own pictures and animation preference"):
+        for phrase in ("Imvault 0.19.0", "optional avatar", "without embedded metadata", "Show animated avatars", "reduced-motion", "visible only to signed-in members", "own pictures and animation preference"):
             self.assertIn(phrase, photos)
 
     def test_public_site_contract(self):
@@ -319,6 +326,7 @@ class ImageSizeTests(unittest.TestCase):
                     self.assertEqual(tuple(image_size(path)), (100, 50))
             path.write_bytes(b"GIF89a" + bytes(40))
             self.assertIsNone(image_size(path))
+
 
 
 if __name__ == "__main__":
