@@ -116,24 +116,66 @@ the exact release notes. The workshop section also shows Arise's release while
 retaining its experimental status. `releases.json` records the currently published stable
 versions; update it with those labels and links during each release. Content
 checks reject missing, duplicate, stale or mismatched release links. Installation
-guides and the footer's Latest release redirects remain available. Keep feature descriptions aligned with the
-project READMEs. The Arise description deliberately calls out its experimental
+guides and the footer's Latest release redirects remain available. Product pages
+describe the purpose, experience, boundaries, installation, and backup approach
+in no more than 650 words. Keep release-specific prose and UI walkthroughs in
+the app's documentation and release notes. The Arise description deliberately calls out its experimental
 status. Application accounts live on their individual installations.
 
-Screenshots are copied, unmodified, from the projects' demo/test screenshots:
+Each app has a documentation landing page at `/<app>/docs/`, linked from its
+home card, product page and footer. The five topics are installation,
+configuration, backups/recovery, upgrades, and help. These pages link to the
+guides maintained alongside each app rather than copying commands into this
+repository. When a guide moves, update its link here. Content and HTTP checks
+cover the docs routes, topic anchors, canonical URLs, sitemap and guide links;
+browser checks exercise them without JavaScript. Tests also reject release
+prose and oversized product copy before deployment. A failed content gate leaves
+the existing deployed files untouched.
 
-- `assets/imvault-gallery.png`: `imvault/docs/images/recent.png` at
-  `ff69d6af87e87204117c106cbdf2bb803ba31cde`.
-- `assets/witmoot-board.png`: `witmoot/docs/images/board.png` at
+The footer names Marcus and links to the public GitHub profile. The homepage
+links to website issues for questions and suggestions. Do not add a personal
+address or location without the maintainer choosing to publish it.
+
+Screenshots show isolated demo/test instances. Browser images use lossless WebP;
+PNG versions of Imvault and Witmoot remain available for social preview cards
+(the Imvault social image is scaled to 800 pixels wide):
+
+- `assets/imvault-gallery.webp`: captured from Imvault at
+  `8e695909352fbbfbd3ebcfedcd963c763a329a06`. Its disposable demo uses the
+  animation in `design/screenshots/animation.gif`, which has a visible first
+  frame. The fixture generator requires Pillow only when regenerating it.
+  Run Imvault's `make demo` in a disposable checkout, then from this repository
+  run `CHROMIUM=/usr/bin/chromium node scripts/site/capture-imvault.mjs http://127.0.0.1:8080 /tmp/imvault-gallery.png`.
+  This replaces only the demo member's sample GIF and captures the real Recent
+  page. The script refuses remote URLs and blocks external requests. Convert
+  the result using the lossless command below.
+- `assets/witmoot-board.webp`: losslessly converted from `witmoot/docs/images/board.png` at
   `8f20e2f26bf594394526ee7f6a558f013fd3c47b` (0.7.2).
 
-- `assets/songstead-recent.png`: captured from Songstead 0.9.0 at
+- `assets/songstead-recent.webp`: captured from Songstead 0.9.0 at
   `c9e5bbd`, with four fictional music
   recommendations, local sample artwork and three disposable demo accounts.
   It shows the optional tile layout; List remains the application default. To reproduce it after
   `make deps`, run `SONGSTEAD_BINARY=/path/to/songstead CHROMIUM=/usr/bin/chromium node scripts/site/capture-songstead.mjs`.
   The script creates a temporary database, uses local HTTP only, blocks external
-  browser requests, and deletes its demo data when it finishes.
+  browser requests, and deletes its demo data when it finishes. It writes
+  `/tmp/songstead-recent.png` by default; `SCREENSHOT_OUTPUT` overrides that
+  destination. Convert it to WebP after capturing.
+
+For example, with Pillow installed for asset maintenance:
+
+```sh
+python3 - <<'PY'
+from PIL import Image
+Image.open('/tmp/imvault-gallery.png').save(
+    'site/assets/imvault-gallery.webp', format='WEBP', lossless=True, method=6)
+PY
+```
+
+Keep screenshots of real application pages, with fictional content and demo
+accounts. The homepage links each preview to its full image. A public interactive
+demo would need a dedicated sample instance; private community instances are
+not demo targets.
 
 They contain sample media and conversations, not a live community. The house mark
 is an SVG drawn for this site. `assets/comfy-robot.png` is the site's comfy robot

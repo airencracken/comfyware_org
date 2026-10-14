@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Browser checks use a temporary local server unless SITE_URL is supplied.
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { once } from 'node:events';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -11,7 +11,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { checkThemes } from './themes.mjs';
 
 const root = fileURLToPath(new URL('../../site/', import.meta.url));
-const routes = ['/', '/imvault/', '/witmoot/', '/songstead/', '/principles/', '/404.html'];
+const routes = ['/', '/imvault/', '/witmoot/', '/songstead/', '/principles/', '/imvault/docs/', '/witmoot/docs/', '/songstead/docs/', '/404.html'];
 const screenshotDir = process.env.SCREENSHOT_DIR;
 let server;
 let browser;
@@ -19,6 +19,10 @@ let checks = 0;
 function check(condition, message) { assert.ok(condition, message); checks++; }
 
 try {
+  for (const url of ['http://example.org', 'http://127.0.0.1.example.org', 'https://127.0.0.1', 'file:///tmp/demo', 'http://user:password@127.0.0.1']) {
+    const result = spawnSync(process.execPath, [fileURLToPath(new URL('./capture-imvault.mjs', import.meta.url)), url], { timeout: 5000 });
+    check(result.status === 1, `Screenshot capture refuses unsafe destination: ${url}`);
+  }
   let base = process.env.SITE_URL;
   if (!base) {
     server = spawn('python3', ['-u', '-c', `
@@ -80,15 +84,26 @@ server.serve_forever()
         });
         check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${route}: overflow at ${width}px`);
         check(await page.locator('h1').count() === 1, `${route}: one main heading`);
+        if (['/imvault/', '/witmoot/', '/songstead/'].includes(route)) {
+          const height = await page.evaluate(() => document.documentElement.scrollHeight);
+          check(height < (width >= 1100 ? 4300 : 6000), `${route}: product page length at ${width}px (${height}px)`);
+        }
+        if (route === '/' && width === 1440) {
+          const cards = await page.locator('.project').evaluateAll(cards => cards.map(card => {
+            const box = card.getBoundingClientRect();
+            return { top: box.top, width: box.width };
+          }));
+          check(cards.length === 3 && cards.every(card => Math.abs(card.width-cards[0].width) < 1 && Math.abs(card.top-cards[0].top) < 1), 'Three equal app cards on desktop');
+        }
         if (route === '/' || route === '/songstead/') {
-          const screenshot = await page.locator('img[src="/assets/songstead-recent.png"]').evaluate(image => {
+          const screenshot = await page.locator('img[src="/assets/songstead-recent.webp"]').evaluate(image => {
             const box = image.getBoundingClientRect();
             return { width: box.width, height: box.height, naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight };
           });
           check(screenshot.width > 0 && screenshot.naturalWidth === 1280 && screenshot.naturalHeight === 1289, `${route}: real Songstead screenshot at ${width}px`);
           if (route === '/songstead/') {
             check(Math.abs(screenshot.width / screenshot.height - 1280 / 1289) < 0.01, `Songstead screenshot preserves its full aspect ratio at ${width}px`);
-            check(await page.getByRole('link', { name: 'View the full Songstead screenshot' }).getAttribute('href') === '/assets/songstead-recent.png', 'Full screenshot link');
+            check(await page.getByRole('link', { name: 'View the full Songstead screenshot' }).getAttribute('href') === '/assets/songstead-recent.webp', 'Full screenshot link');
           }
         }
         const accessibility = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice']).analyze();
@@ -142,6 +157,14 @@ server.serve_forever()
   const ariseRelease=page.getByRole('link',{name:'Arise 0.0.42',exact:true});
   check(await ariseRelease.isVisible(),'Arise release is visible alongside its experimental status');
   check(await ariseRelease.getAttribute('href')==='https://github.com/airencracken/arise/releases/tag/v0.0.42','Arise release links to matching notes');
+  for (const app of ['imvault', 'witmoot', 'songstead']) {
+    await page.goto(base+`/${app}/`);
+    await page.getByRole('link', { name: 'Documentation', exact: true }).click();
+    check(new URL(page.url()).pathname === `/${app}/docs/`, `${app}: documentation navigation without JavaScript`);
+    await page.getByRole('link', { name: 'Back up', exact: true }).click();
+    check(new URL(page.url()).hash === '#backups', `${app}: backup topic navigation without JavaScript`);
+    check(await page.getByRole('heading', { name: 'Back up and recover.', exact: true }).isVisible(), `${app}: recovery guidance is readable`);
+  }
   await page.goto(base+'/songstead/');
   const privacyQuestion = page.getByText('Who can see what I share?', { exact: true });
   await privacyQuestion.focus();

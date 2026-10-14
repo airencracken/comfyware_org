@@ -58,6 +58,7 @@ test: check
 test-content:
 	python3 scripts/site/test_content.py
 	python3 scripts/site/test_songstead.py
+	python3 scripts/site/test_docs.py
 
 test-http:
 	python3 scripts/site/test_http.py

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Imvault documentation · Comfyware</title>
+  <meta name="description" content="Install, configure, back up, upgrade, and troubleshoot your Imvault installation. A guide to the documentation maintained with the app.">
+  <link rel="canonical" href="https://comfyware.org/imvault/docs/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Imvault documentation">
+  <meta property="og:description" content="Install, configure, back up, upgrade, and troubleshoot your Imvault installation. A guide to the documentation maintained with the app.">
+  <meta property="og:url" content="https://comfyware.org/imvault/docs/">
+  <meta property="og:image" content="https://comfyware.org/assets/imvault-gallery.png">
+  <meta property="og:image:alt" content="An Imvault demo gallery with sample images and clips">
+  <meta name="theme-color" content="#f7f5ed" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#18221e" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon-64.png" type="image/png" sizes="64x64">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <script src="/assets/theme.js"></script>
+  <link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header wrap"><a class="brand" href="/" aria-label="Comfyware home"><img src="/assets/mark.svg" width="35" height="35" alt=""><span class="wordmark">comfyware</span></a><nav class="site-nav" aria-label="Main navigation"><a href="/imvault/" aria-current="page">Imvault</a><a href="/witmoot/">Witmoot</a><a href="/songstead/">Songstead</a><a href="/principles/">Principles</a><a href="/#sponsor">Sponsor</a></nav>
+    <label class="theme-picker" hidden><span class="visually-hidden">Color theme</span><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></header>
+  <main id="main" class="wrap reading-page" tabindex="-1">
+    <a class="back-link" href="/imvault/">Back to Imvault</a>
+    <section class="hero product-hero" aria-labelledby="welcome"><p class="eyebrow">Imvault · Documentation</p><h1 id="welcome">Look after<br>your place.</h1><p class="intro">Install, run, and recover your Imvault instance. These guides live with the app’s source, so instructions and code can change together.</p><nav class="docs-nav" aria-label="Documentation topics"><a href="#install">Install</a><a href="#operate">Configure</a><a href="#backups">Back up</a><a href="#upgrades">Upgrade</a><a href="#help">Get help</a></nav></section>
+    <section id="install" class="section" aria-labelledby="install-heading"><h2 id="install-heading">Install and get started.</h2><ul class="guide-list">
+      <li><a href="https://github.com/airencracken/imvault/blob/master/docs/releases.md">Downloads, checksums, and installation</a><p>Choose a release and follow the setup instructions for your system.</p></li>
+      <li><a href="https://github.com/airencracken/comfyware#add-the-overlay">Gentoo overlay</a><p>Install through Portage with the supplied native services.</p></li>
+      <li><a href="https://github.com/airencracken/imvault#readme">Build from source or try the local demo</a><p>The README is the starting point for the development setup.</p></li>
+    </ul></section>
+    <section id="operate" class="section" aria-labelledby="operate-heading"><h2 id="operate-heading">Configure and look after it.</h2><ul class="guide-list">
+        <li><a href="https://github.com/airencracken/imvault/blob/master/docs/configuration.md">Configuration</a><p>Storage, mail, authentication, and instance settings.</p></li>
+        <li><a href="https://github.com/airencracken/imvault/blob/master/docs/accounts.md">Accounts and invitations</a><p>Provision administrators and manage access.</p></li>
+        <li><a href="https://github.com/airencracken/imvault/blob/master/docs/storage.md">Media storage</a><p>Local disk, S3-compatible storage, and moving files.</p></li>
+        <li><a href="https://github.com/airencracken/imvault/blob/master/docs/discussions.md">Connect Witmoot</a><p>Choose when an album becomes a conversation.</p></li>
+      <li><a href="https://github.com/airencracken/imvault/blob/master/docs/reverse-proxies.md">HTTPS reverse proxies</a><p>Put a reverse proxy in front of the service before sharing it online.</p></li>
+    </ul></section>
+    <section id="backups" class="section" aria-labelledby="backups-heading"><h2 id="backups-heading">Back up and recover.</h2><p>Automatic daily backups are a starting point. Keep a protected copy on another machine and test a restore before you need one.</p><ul class="guide-list">
+      <li><a href="https://github.com/airencracken/imvault/blob/master/docs/automatic-backups.md">Automatic backups</a><p>What is included, verification, compression, retention, and checking failures.</p></li>
+      <li><a href="https://github.com/airencracken/imvault/blob/master/docs/operations.md">Operations and restore drills</a></li><li><a href="https://github.com/airencracken/imvault/blob/master/docs/accounts.md">Accounts and data</a></li>
+    </ul></section>
+    <section id="upgrades" class="section" aria-labelledby="upgrades-heading"><h2 id="upgrades-heading">Upgrade with a way back.</h2><p>Read the release notes and upgrade instructions first. Make a verified backup before installing an update; database migrations can require restoring that backup to go back.</p><ul class="guide-list"><li><a href="https://github.com/airencracken/imvault/releases/latest">Latest release and release notes</a></li><li><a href="https://github.com/airencracken/imvault/blob/master/docs/releases.md">Upgrade and rollback instructions</a></li></ul></section>
+    <section id="help" class="section" aria-labelledby="help-heading"><h2 id="help-heading">When something needs attention.</h2><p>Start with the <a href="https://github.com/airencracken/imvault/blob/master/docs/deployment.md">deployment guide</a> for configuration and service setup. If you are stuck, <a href="https://github.com/airencracken/imvault/issues">search or open an issue</a> with your app version, installation method, and the relevant error. Remove passwords, tokens, and private community data before sharing logs.</p></section>
+  </main>
+  <footer class="site-footer wrap"><p>Imvault documentation · Comfyware.<br>Made by <a href="https://github.com/airencracken">Marcus</a>.</p><div class="footer-links"><a href="/imvault/">About Imvault</a><a href="/principles/">Principles</a><a href="https://github.com/airencracken/imvault">Source</a><a href="https://github.com/airencracken/imvault/releases/latest">Latest release</a></div></footer>
+</body>
+</html>

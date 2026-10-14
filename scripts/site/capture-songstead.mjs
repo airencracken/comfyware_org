@@ -12,7 +12,7 @@ import { chromium } from 'playwright';
 
 const binary = process.env.SONGSTEAD_BINARY;
 assert.ok(binary, 'Set SONGSTEAD_BINARY to a built Songstead executable');
-const destination = fileURLToPath(new URL('../../site/assets/songstead-recent.png', import.meta.url));
+const destination = process.env.SCREENSHOT_OUTPUT || resolve(tmpdir(), 'songstead-recent.png');
 const directory = await mkdtemp(resolve(tmpdir(), 'songstead-screenshot-'));
 const environment = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('SONGSTEAD_')));
 const password = 'demo-password';

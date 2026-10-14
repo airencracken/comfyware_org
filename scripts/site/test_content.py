@@ -17,7 +17,8 @@ SITE = Path(__file__).resolve().parents[2] / "site"
 ORIGIN = "https://comfyware.org"
 ROUTES = {"/": "index.html", "/imvault/": "imvault/index.html",
           "/witmoot/": "witmoot/index.html", "/principles/": "principles/index.html",
-          "/songstead/": "songstead/index.html", "/404.html": "404.html"}
+          "/songstead/": "songstead/index.html", "/404.html": "404.html",
+          **{f"/{app}/docs/": f"{app}/docs/index.html" for app in ("imvault", "witmoot", "songstead")}}
 NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/songstead/", "Songstead"), ("/principles/", "Principles"), ("/#sponsor", "Sponsor")]
 # Bytes a visitor or social preview crawler downloads for one image.
 IMAGE_BUDGET = 200_000
@@ -36,10 +37,13 @@ class Document(HTMLParser):
         self.stack = []
         self.errors = []
         self.nav = None
+        self.nav_depth = None
         self.nav_text = None
         self.inline_script = False
         self.links = []
         self.current_link = None
+        self.main_text = []
+        self.prose = []
         self.feed(text)
         self.close()
         if self.stack:
@@ -55,12 +59,15 @@ class Document(HTMLParser):
             self.ids.append(attrs["id"])
         if tag == "nav" and attrs.get("class") == "site-nav":
             self.nav = []
-        elif tag == "a" and self.nav is not None and "nav" in self.stack:
+            self.nav_depth = len(self.stack) + 1
+        elif tag == "a" and self.nav_depth is not None:
             self.nav.append([attrs.get("href"), "", attrs.get("aria-current")])
         if tag not in VOID:
             self.stack.append(tag)
 
     def handle_endtag(self, tag):
+        if tag == "nav" and len(self.stack) == self.nav_depth:
+            self.nav_depth = None
         if tag == "a":
             self.current_link = None
         if not self.stack or self.stack[-1] != tag:
@@ -69,9 +76,13 @@ class Document(HTMLParser):
             self.stack.pop()
 
     def handle_data(self, data):
+        if "main" in self.stack:
+            self.main_text.append(data)
+            if self.current_link is None or "data-release" not in self.current_link[0]:
+                self.prose.append(data)
         if self.current_link is not None:
             self.current_link[1] += data
-        if self.nav and "nav" in self.stack and self.stack[-1] == "a":
+        if self.nav and self.nav_depth is not None and self.stack[-1] == "a":
             self.nav[-1][1] += data
         if self.stack and self.stack[-1] == "script" and data.strip():
             self.inline_script = True
@@ -120,6 +131,31 @@ def release_errors(doc, apps, versions):
     return errors
 
 
+def editorial_errors(doc, route):
+    """Keep product pages brief and operational guides easy to find."""
+    errors = []
+    app = route.strip("/").split("/")[0]
+    links = {attrs.get("href") for attrs in doc.tags["a"]}
+    if route == f"/{app}/" and app in ("imvault", "witmoot", "songstead"):
+        if len(" ".join(doc.main_text).split()) > 650:
+            errors.append("Product copy exceeds the 650-word budget; move details into documentation")
+        if re.search(r"\b[0-9]+\.[0-9]+\.[0-9]+\b", " ".join(doc.prose)):
+            errors.append("Version-specific prose belongs in release notes")
+        for topic in ("install", "backups"):
+            if f"/{app}/docs/#{topic}" not in links:
+                errors.append(f"Product must link to {topic} documentation")
+    if route == f"/{app}/docs/":
+        for topic in ("install", "operate", "backups", "upgrades", "help"):
+            if topic not in doc.ids or "#" + topic not in links:
+                errors.append(f"Documentation must expose the {topic} topic")
+        source = f"https://github.com/airencracken/{app}"
+        for path in ("/blob/master/docs/releases.md", "/blob/master/docs/deployment.md",
+                     "/blob/master/docs/automatic-backups.md", "/releases/latest", "/issues"):
+            if source + path not in links:
+                errors.append(f"Documentation must link to the maintained guide: {path}")
+    return errors
+
+
 def validate_site(root):
     errors = []
     versions = release_versions()
@@ -132,6 +168,7 @@ def validate_site(root):
         text = path.read_text()
         doc = Document(text)
         documents[route] = doc
+        errors.extend(f"{route}: {error}" for error in editorial_errors(doc, route))
         apps = list(versions) if route == "/" else [route.strip("/")] if route.strip("/") in versions else []
         errors.extend(f"{route}: {error}" for error in release_errors(doc, apps, versions))
         errors.extend(f"{route}: {error}" for error in doc.errors)
@@ -175,7 +212,7 @@ def validate_site(root):
             path = root / icon.get("href", "").lstrip("/")
             if path.is_file() and path.stat().st_size > ICON_BUDGET:
                 errors.append(f"{route}: Oversized icon: {icon['href']}")
-        current = {"/imvault/": "/imvault/", "/witmoot/": "/witmoot/", "/principles/": "/principles/", "/songstead/": "/songstead/"}.get(route)
+        current = next((href for href, _ in NAV if route.startswith(href) and not href.startswith('/#')), None)
         expected_nav = [[href, text, "page" if href == current else None] for href, text in NAV]
         if doc.nav != expected_nav:
             errors.append(f"{route}: Navigation differs from the other pages")
@@ -303,32 +340,12 @@ class SiteContractTests(unittest.TestCase):
                 self.assertIn(origin + "/blob/master/docs/releases.md", links)
                 self.assertIn(origin + "/blob/master/docs/deployment.md", links)
 
-    def test_witmoot_avatar_settings_are_documented(self):
-        text = (SITE / "witmoot/index.html").read_text()
-        for phrase in ("Witmoot 0.17.0", "profile picture", "Animated GIFs", "account settings", "reduced-motion", "still pictures"):
-            self.assertIn(phrase, text)
-
-    def test_optional_member_profiles_are_documented_for_all_apps(self):
-        for app, settings in (("songstead", "Your settings"), ("witmoot", "Your account → Edit your profile"), ("imvault", "Settings → Account → Profile")):
-            with self.subTest(app=app):
-                text = (SITE / app / "index.html").read_text()
-                for phrase in (settings, "optional name", "short plain-text bio", "five labeled web links", "visible only to signed-in members", "Your username stays the same", "own account export", "Clear the fields"):
-                    self.assertIn(phrase, text)
-
     def test_automatic_backups_are_described_for_each_app(self):
         for app in ("songstead", "imvault", "witmoot"):
             content = (SITE / app / "index.html").read_text()
-            for phrase in ("verified backups automatically", "zstd", "gzip", "seven copies", "configurable storage cap", "last success", "another machine", f"{app}/blob/master/docs/automatic-backups.md"):
+            for phrase in ("verified backups automatically each day", "another machine", "practice restoring", f"/{app}/docs/#backups"):
                 with self.subTest(app=app, phrase=phrase):
                     self.assertIn(phrase, content)
-
-    def test_search_and_imvault_avatar_privacy_are_documented(self):
-        music = (SITE / "songstead/index.html").read_text()
-        for phrase in ("Open Search", "private sends and groups", "Personal listening notes and ratings are never searched", "spoiler preference", "without JavaScript"):
-            self.assertIn(phrase, music)
-        photos = (SITE / "imvault/index.html").read_text()
-        for phrase in ("Imvault 0.19.0", "optional avatar", "without embedded metadata", "Show animated avatars", "reduced-motion", "visible only to signed-in members", "own pictures and animation preference"):
-            self.assertIn(phrase, photos)
 
     def test_public_site_contract(self):
         self.assertEqual(validate_site(SITE), [])
@@ -336,8 +353,8 @@ class SiteContractTests(unittest.TestCase):
     def test_no_private_or_build_files_in_public_root(self):
         self.assertEqual({str(p.relative_to(SITE)) for p in SITE.rglob("*") if p.is_file()}, {
             *ROUTES.values(), "assets/site.css", "assets/theme.js", "assets/mark.svg", "assets/comfy-robot.png",
-            "assets/comfy-robot.webp", "assets/favicon-64.png", "assets/apple-touch-icon.png", "assets/imvault-gallery.png",
-            "assets/witmoot-board.png", "assets/songstead-jukebox.png", "assets/songstead-recent.png", "robots.txt", "sitemap.xml",
+            "assets/comfy-robot.webp", "assets/favicon-64.png", "assets/apple-touch-icon.png", "assets/imvault-gallery.webp",
+            "assets/witmoot-board.webp", "assets/imvault-gallery.png", "assets/witmoot-board.png", "assets/songstead-jukebox.png", "assets/songstead-recent.webp", "robots.txt", "sitemap.xml",
         })
 
     def test_mutations_are_rejected(self):

@@ -11,6 +11,8 @@ import tempfile
 import time
 import unittest
 
+from test_content import ROUTES
+
 ROOT = Path(__file__).resolve().parents[2]
 SITE = ROOT / "site"
 
@@ -74,8 +76,7 @@ class HTTPContractTests(unittest.TestCase):
             connection.close()
 
     def test_routes_deliver_exact_documents(self):
-        for route, path in (("/", "index.html"), ("/imvault/", "imvault/index.html"),
-                            ("/witmoot/", "witmoot/index.html"), ("/songstead/", "songstead/index.html"), ("/principles/", "principles/index.html")):
+        for route, path in ROUTES.items():
             with self.subTest(route=route):
                 status, headers, body = self.request("GET", route)
                 self.assertEqual(status, 200)
@@ -86,7 +87,7 @@ class HTTPContractTests(unittest.TestCase):
     def test_assets_and_content_types(self):
         assets = {"/assets/site.css": "text/css", "/assets/theme.js": "text/javascript", "/assets/mark.svg": "image/svg+xml", "/assets/comfy-robot.png": "image/png",
                   "/assets/comfy-robot.webp": "image/webp",
-                  "/assets/imvault-gallery.png": "image/png", "/assets/witmoot-board.png": "image/png", "/assets/songstead-jukebox.png": "image/png"}
+                  "/assets/imvault-gallery.webp": "image/webp", "/assets/witmoot-board.webp": "image/webp", "/assets/songstead-recent.webp": "image/webp", "/assets/songstead-jukebox.png": "image/png"}
         for route, mime in assets.items():
             with self.subTest(route=route):
                 status, headers, body = self.request("GET", route)
@@ -96,7 +97,7 @@ class HTTPContractTests(unittest.TestCase):
                 self.assertEqual(headers["cache-control"], "public, max-age=3600")
 
     def test_directory_redirects(self):
-        for route in ("/imvault", "/witmoot", "/songstead", "/principles"):
+        for route in (route.rstrip("/") for route in ROUTES if route not in ("/", "/404.html")):
             status, headers, _ = self.request("GET", route)
             self.assertEqual(status, 308)
             self.assertEqual(headers["location"], route + "/")

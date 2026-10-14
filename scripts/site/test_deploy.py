@@ -55,6 +55,26 @@ class DeployTests(unittest.TestCase):
         self.assertIn("dry run only", result.stdout)
         self.assertEqual(tree(self.target), ["keep.html"])
 
+    def test_invalid_docs_prevent_any_publication(self):
+        """A failed content gate must leave the existing document root intact."""
+        with tempfile.TemporaryDirectory() as directory:
+            checkout = Path(directory) / "checkout"
+            checkout.mkdir()
+            shutil.copy2(ROOT / "Makefile", checkout)
+            shutil.copytree(ROOT / "scripts", checkout / "scripts",
+                            ignore=shutil.ignore_patterns("node_modules", "__pycache__"))
+            shutil.copytree(SITE, checkout / "site")
+            broken = checkout / "site/songstead/docs/index.html"
+            broken.write_text(broken.read_text().replace('id="backups"', 'id="missing"'))
+            marker = self.target / "existing.html"
+            marker.write_text("the currently deployed site")
+            result = subprocess.run(["make", "deploy", f"DEPLOY_DIR={self.target}"],
+                                    cwd=checkout, capture_output=True, text=True, timeout=60)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("expose the backups", result.stderr)
+            self.assertEqual(tree(self.target), ["existing.html"])
+            self.assertEqual(marker.read_text(), "the currently deployed site")
+
     def test_refuses_dangerous_or_mistyped_destinations(self):
         inside = Path(tempfile.mkdtemp(dir=ROOT))
         self.addCleanup(shutil.rmtree, inside)

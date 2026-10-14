@@ -112,19 +112,20 @@ p + p { margin-top: 1rem; }
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 29px; }
 .section-heading .eyebrow { margin-bottom: 10px; }
 .section-heading > p { color: var(--muted); font-size: .9rem; max-width: 245px; }
-.project-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 25px; }
-.project { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); overflow: hidden; }
-.project-copy { padding: 30px 30px 27px; }
-.project-label { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 14px; }
+.project-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 25px; }
+.project { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.project-copy { padding: 24px; flex: 1; display: flex; flex-direction: column; }
+.project-label { display: flex; flex-direction: column; align-items: start; gap: 3px; margin-bottom: 14px; }
 .project h3 { font-family: Georgia, "Times New Roman", serif; font-size: 2rem; letter-spacing: -.04em; font-weight: 400; }
 .project-kind { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 .project p { color: var(--muted); max-width: 400px; }
 .project .project-tagline { color: var(--ink); font-weight: 550; margin-bottom: 9px; }
-.project-copy > a { display: inline-block; margin-top: 22px; font-size: .9rem; font-weight: 550; }
-.project-preview { margin: 0; padding: 24px 24px 0; background: var(--blue-wash); border-top: 1px solid var(--line); }
+.project-links { display: flex; flex-wrap: wrap; gap: 12px 22px; margin-top: auto; padding-top: 22px; font-size: .9rem; font-weight: 550; }
+.project-preview { margin: 0; padding: 12px 12px 0; background: var(--blue-wash); border-top: 1px solid var(--line); }
 .project-preview.witmoot { background: var(--wash); }
 .project-preview a { display: block; border: 1px solid var(--image-line); border-radius: 5px 5px 0 0; overflow: hidden; }
-.project-preview img { width: 100%; aspect-ratio: 1.72; object-fit: cover; object-position: top; }
+.project-preview img { width: 100%; aspect-ratio: 1.2; object-fit: cover; object-position: top; }
+.project-preview figcaption a { display: inline; border: 0; border-radius: 0; }
 .project-preview figcaption { padding: 9px 0 11px; color: var(--muted); font-size: .71rem; }
 .about-layout { display: grid; grid-template-columns: .95fr 1.2fr; gap: 85px; }
 .about-layout .eyebrow { margin-bottom: 15px; }
@@ -221,10 +222,15 @@ details > p { padding: 0 24px 20px; color: var(--muted); }
   a { color: inherit; }
 }
 
-/* Songstead is introduced alongside the released projects. */
-.project.songstead { grid-column: 1 / -1; display: grid; grid-template-columns: 1.3fr 1fr; align-items: center; }
-.songstead .project-preview { background: var(--blue-wash); text-align: center; }
-@media (max-width: 760px) { .project.songstead { grid-template-columns: 1fr; } }
-
 .release-version { margin-top:1rem; font-size:.85rem; color:var(--muted); }
 .release-version a { font-weight:600; }
+
+.section > h2 + p { margin-top: 22px; }
+.docs-nav { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 30px; }
+.guide-list { padding-left: 24px; margin-block: 24px 0; }
+.guide-list li { margin-top: 18px; padding-left: 5px; }
+.guide-list p { color: var(--muted); font-size: .92rem; }
+@media (min-width: 761px) and (max-width: 1100px) {
+  .project-grid { grid-template-columns: 1fr; }
+  .project { display: grid; grid-template-columns: 1fr 1fr; }
+}
