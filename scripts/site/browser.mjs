@@ -129,7 +129,20 @@ server.serve_forever()
   check(new URL(page.url()).pathname === '/', 'Home navigation works without JavaScript');
   await page.getByRole('link', { name: 'Meet Songstead' }).click();
   check(new URL(page.url()).pathname === '/songstead/', 'Songstead navigation works without JavaScript');
-  check(await page.getByText('Songstead · Music recommendations · 0.9.0', { exact: false }).count() > 0, 'Songstead release version is visible');
+  check(await page.getByRole('link',{name:'Songstead 0.10.0',exact:true}).isVisible(), 'Songstead release version is visible');
+  for (const [app,name,version] of [['imvault','Imvault','0.19.0'],['witmoot','Witmoot','0.17.0'],['songstead','Songstead','0.10.0']]) {
+    for (const route of ['/',`/${app}/`]) {
+      await page.goto(base+route);
+      const release=page.getByRole('link',{name:`${name} ${version}`,exact:true});
+      check(await release.isVisible(),`${name} version is visible on ${route} without JavaScript`);
+      check(await release.getAttribute('href')===`https://github.com/airencracken/${app}/releases/tag/v${version}`,`${name} version links to matching release notes`);
+    }
+  }
+  await page.goto(base+'/');
+  const ariseRelease=page.getByRole('link',{name:'Arise 0.0.42',exact:true});
+  check(await ariseRelease.isVisible(),'Arise release is visible alongside its experimental status');
+  check(await ariseRelease.getAttribute('href')==='https://github.com/airencracken/arise/releases/tag/v0.0.42','Arise release links to matching notes');
+  await page.goto(base+'/songstead/');
   const privacyQuestion = page.getByText('Who can see what I share?', { exact: true });
   await privacyQuestion.focus();
   await page.keyboard.press('Enter');

@@ -2,6 +2,7 @@
 """Validate the public routes, metadata, links, and self-contained static assets."""
 
 import collections
+import json
 from html.parser import HTMLParser
 from pathlib import Path
 import re
@@ -22,6 +23,8 @@ NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/songstead/", "Song
 IMAGE_BUDGET = 200_000
 MASCOT_BUDGETS = {"assets/comfy-robot.webp": 45_000, "assets/comfy-robot.png": 100_000}
 ICON_BUDGET = 64_000
+RELEASE_NAMES = {"imvault": "Imvault", "witmoot": "Witmoot", "songstead": "Songstead", "arise": "Arise"}
+RELEASE_FILE = Path(__file__).with_name("releases.json")
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
 
 
@@ -35,6 +38,8 @@ class Document(HTMLParser):
         self.nav = None
         self.nav_text = None
         self.inline_script = False
+        self.links = []
+        self.current_link = None
         self.feed(text)
         self.close()
         if self.stack:
@@ -43,6 +48,9 @@ class Document(HTMLParser):
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
         self.tags[tag].append(attrs)
+        if tag == "a":
+            self.current_link = [attrs, ""]
+            self.links.append(self.current_link)
         if "id" in attrs:
             self.ids.append(attrs["id"])
         if tag == "nav" and attrs.get("class") == "site-nav":
@@ -53,12 +61,16 @@ class Document(HTMLParser):
             self.stack.append(tag)
 
     def handle_endtag(self, tag):
+        if tag == "a":
+            self.current_link = None
         if not self.stack or self.stack[-1] != tag:
             self.errors.append(f"Mismatched closing tag: {tag}")
         else:
             self.stack.pop()
 
     def handle_data(self, data):
+        if self.current_link is not None:
+            self.current_link[1] += data
         if self.nav and "nav" in self.stack and self.stack[-1] == "a":
             self.nav[-1][1] += data
         if self.stack and self.stack[-1] == "script" and data.strip():
@@ -82,8 +94,35 @@ def image_size(path):
     return None
 
 
+def release_versions(path=RELEASE_FILE):
+    versions = json.loads(path.read_text())
+    if not isinstance(versions, dict) or set(versions) != set(RELEASE_NAMES):
+        raise ValueError("Release versions must name exactly the published projects")
+    number = r"(?:0|[1-9][0-9]*)"
+    for version in versions.values():
+        if not isinstance(version, str) or not re.fullmatch(rf"{number}\.{number}\.{number}", version):
+            raise ValueError("Release versions must be stable X.Y.Z versions")
+    return versions
+
+
+def release_errors(doc, apps, versions):
+    errors = []
+    links = [(attrs, text.strip()) for attrs, text in doc.links if "data-release" in attrs]
+    if collections.Counter(attrs["data-release"] for attrs, _ in links) != collections.Counter(apps):
+        errors.append("Expected one current release link for each app")
+    for attrs, text in links:
+        app = attrs["data-release"]
+        if app not in apps:
+            continue
+        expected = f"https://github.com/airencracken/{app}/releases/tag/v{versions[app]}"
+        if attrs.get("href") != expected or text != f"{RELEASE_NAMES[app]} {versions[app]}":
+            errors.append(f"{app}: Release version and link must match the release manifest")
+    return errors
+
+
 def validate_site(root):
     errors = []
+    versions = release_versions()
     documents = {}
     for route, relative in ROUTES.items():
         path = root / relative
@@ -93,6 +132,8 @@ def validate_site(root):
         text = path.read_text()
         doc = Document(text)
         documents[route] = doc
+        apps = list(versions) if route == "/" else [route.strip("/")] if route.strip("/") in versions else []
+        errors.extend(f"{route}: {error}" for error in release_errors(doc, apps, versions))
         errors.extend(f"{route}: {error}" for error in doc.errors)
         if not text.lower().startswith("<!doctype html>"):
             errors.append(f"{route}: Missing HTML doctype")
@@ -210,6 +251,48 @@ def validate_site(root):
 
 
 class SiteContractTests(unittest.TestCase):
+    def test_all_app_versions_match_their_release_notes(self):
+        versions = release_versions()
+        for route in ("index.html", "imvault/index.html", "witmoot/index.html", "songstead/index.html"):
+            doc = Document((SITE / route).read_text())
+            apps = list(versions) if route == "index.html" else [route.split("/")[0]]
+            self.assertEqual(release_errors(doc, apps, versions), [])
+
+    def test_release_link_mutations_are_rejected(self):
+        versions = release_versions()
+        original = (SITE / "index.html").read_text()
+        before = 'data-release="imvault" href="https://github.com/airencracken/imvault/releases/tag/v0.19.0">Imvault 0.19.0'
+        self.assertIn(before, original)
+        for after in (
+            before.replace('data-release="imvault"', 'data-release="witmoot"'),
+            before.replace("v0.19.0", "v0.18.0"),
+            before.replace(">Imvault 0.19.0", ">Imvault 0.18.0"),
+            before.replace("https://github.com", "https://example.com"),
+            before.replace("data-release", "data-old-release"),
+        ):
+            with self.subTest(after=after):
+                self.assertTrue(release_errors(Document(original.replace(before, after, 1)), list(versions), versions))
+
+    def test_release_manifest_schema_and_version_boundaries(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "releases.json"
+            for value in (None, [], {}, {"imvault": "1.0.0"}, dict(release_versions(), unknown="1.0.0")):
+                path.write_text(json.dumps(value))
+                with self.assertRaises(ValueError):
+                    release_versions(path)
+            for invalid in (None, 1, "1.0", "01.2.3", "1.2.3-beta", "1.2.3\n", "../1.2.3", "<script>"):
+                path.write_text(json.dumps(dict(release_versions(), songstead=invalid)))
+                with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                    release_versions(path)
+            # Exercise stable versions beyond today's particular release numbers.
+            for major in range(5):
+                for minor in (0, 9, 10, 99):
+                    version = f"{major}.{minor}.0"
+                    path.write_text(json.dumps(dict(release_versions(), songstead=version)))
+                    versions = release_versions(path)
+                    doc = Document(f'<a data-release="songstead" href="https://github.com/airencracken/songstead/releases/tag/v{version}">Songstead {version}</a>')
+                    self.assertEqual(release_errors(doc, ["songstead"], versions), [])
+
     def test_product_pages_expose_installation_and_release_routes(self):
         for app in ("imvault", "witmoot", "songstead"):
             with self.subTest(app=app):

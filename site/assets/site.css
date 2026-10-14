@@ -225,3 +225,6 @@ details > p { padding: 0 24px 20px; color: var(--muted); }
 .project.songstead { grid-column: 1 / -1; display: grid; grid-template-columns: 1.3fr 1fr; align-items: center; }
 .songstead .project-preview { background: var(--blue-wash); text-align: center; }
 @media (max-width: 760px) { .project.songstead { grid-template-columns: 1fr; } }
+
+.release-version { margin-top:1rem; font-size:.85rem; color:var(--muted); }
+.release-version a { font-weight:600; }

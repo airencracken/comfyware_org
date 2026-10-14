@@ -111,8 +111,12 @@ local sovereignty, accountable hosts, respect for attention, bounded communities
 exit and ownership, and community-defined house rules. These guide product choices;
 they are not a claim that every planned portability feature already exists.
 
-Project links use the installation guides and latest-release redirects, avoiding
-hardcoded versions that become stale. Keep feature descriptions aligned with the
+The three app cards and product pages show matching version labels and links to
+the exact release notes. The workshop section also shows Arise's release while
+retaining its experimental status. `releases.json` records the currently published stable
+versions; update it with those labels and links during each release. Content
+checks reject missing, duplicate, stale or mismatched release links. Installation
+guides and the footer's Latest release redirects remain available. Keep feature descriptions aligned with the
 project READMEs. The Arise description deliberately calls out its experimental
 status. Application accounts live on their individual installations.
 
