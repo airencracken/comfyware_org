@@ -145,7 +145,7 @@ server.serve_forever()
   await page.getByRole('link', { name: 'Meet Songstead' }).click();
   check(new URL(page.url()).pathname === '/songstead/', 'Songstead navigation works without JavaScript');
   check(await page.getByRole('link',{name:'Songstead 0.10.0',exact:true}).isVisible(), 'Songstead release version is visible');
-  for (const [app,name,version] of [['imvault','Imvault','0.19.0'],['witmoot','Witmoot','0.17.0'],['songstead','Songstead','0.10.0']]) {
+  for (const [app,name,version] of [['imvault','Imvault','0.19.0'],['witmoot','Witmoot','0.18.0'],['songstead','Songstead','0.10.0']]) {
     for (const route of ['/',`/${app}/`]) {
       await page.goto(base+route);
       const release=page.getByRole('link',{name:`${name} ${version}`,exact:true});
