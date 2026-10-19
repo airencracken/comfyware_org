@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { spawn, spawnSync } from 'node:child_process';
 import { once } from 'node:events';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
@@ -11,6 +11,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { checkThemes } from './themes.mjs';
 
 const root = fileURLToPath(new URL('../../site/', import.meta.url));
+const releases = JSON.parse(await readFile(new URL('./releases.json', import.meta.url), 'utf8'));
 const routes = ['/', '/imvault/', '/witmoot/', '/songstead/', '/principles/', '/imvault/docs/', '/witmoot/docs/', '/songstead/docs/', '/404.html'];
 const screenshotDir = process.env.SCREENSHOT_DIR;
 let server;
@@ -144,8 +145,9 @@ server.serve_forever()
   check(new URL(page.url()).pathname === '/', 'Home navigation works without JavaScript');
   await page.getByRole('link', { name: 'Meet Songstead' }).click();
   check(new URL(page.url()).pathname === '/songstead/', 'Songstead navigation works without JavaScript');
-  check(await page.getByRole('link',{name:'Songstead 0.11.0',exact:true}).isVisible(), 'Songstead release version is visible');
-  for (const [app,name,version] of [['imvault','Imvault','0.19.0'],['witmoot','Witmoot','0.18.0'],['songstead','Songstead','0.11.0']]) {
+  check(await page.getByRole('link',{name:`Songstead ${releases.songstead}`,exact:true}).isVisible(), 'Songstead release version is visible');
+  for (const [app,name] of [['imvault','Imvault'],['witmoot','Witmoot'],['songstead','Songstead']]) {
+    const version = releases[app];
     for (const route of ['/',`/${app}/`]) {
       await page.goto(base+route);
       const release=page.getByRole('link',{name:`${name} ${version}`,exact:true});
@@ -154,9 +156,9 @@ server.serve_forever()
     }
   }
   await page.goto(base+'/');
-  const ariseRelease=page.getByRole('link',{name:'Arise 0.0.42',exact:true});
+  const ariseRelease=page.getByRole('link',{name:`Arise ${releases.arise}`,exact:true});
   check(await ariseRelease.isVisible(),'Arise release is visible alongside its experimental status');
-  check(await ariseRelease.getAttribute('href')==='https://github.com/airencracken/arise/releases/tag/v0.0.42','Arise release links to matching notes');
+  check(await ariseRelease.getAttribute('href')===`https://github.com/airencracken/arise/releases/tag/v${releases.arise}`,'Arise release links to matching notes');
   for (const app of ['imvault', 'witmoot', 'songstead']) {
     await page.goto(base+`/${app}/`);
     await page.getByRole('link', { name: 'Documentation', exact: true }).click();
