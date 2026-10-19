@@ -84,6 +84,15 @@ class DocumentationTests(unittest.TestCase):
             self.assertIn(app.capitalize(), moderation)
             self.assertIn(f'/{app}/', {attrs.get('href') for attrs, text in missing.links if text == app.capitalize()})
 
+    def test_imvault_library_guides_and_evergreen_features_are_discoverable(self):
+        docs = Document((SITE / 'imvault/docs/index.html').read_text())
+        self.assertIn('https://github.com/airencracken/imvault/blob/master/docs/library.md',
+                      {attrs.get('href') for attrs in docs.tags['a']})
+        product = (SITE / 'imvault/index.html').read_text()
+        for feature in ('date taken', 'batches', 'Trash'):
+            self.assertIn(feature, product)
+        self.assertEqual(editorial_errors(Document(product), '/imvault/'), [])
+
     def test_maintainer_and_contact_are_public(self):
         home = (SITE / 'index.html').read_text()
         self.assertIn('Made by <a href="https://github.com/airencracken">Marcus</a>', home)

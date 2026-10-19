@@ -298,12 +298,13 @@ class SiteContractTests(unittest.TestCase):
     def test_release_link_mutations_are_rejected(self):
         versions = release_versions()
         original = (SITE / "index.html").read_text()
-        before = 'data-release="imvault" href="https://github.com/airencracken/imvault/releases/tag/v0.19.0">Imvault 0.19.0'
+        version = versions["imvault"]
+        before = f'data-release="imvault" href="https://github.com/airencracken/imvault/releases/tag/v{version}">Imvault {version}'
         self.assertIn(before, original)
         for after in (
             before.replace('data-release="imvault"', 'data-release="witmoot"'),
-            before.replace("v0.19.0", "v0.18.0"),
-            before.replace(">Imvault 0.19.0", ">Imvault 0.18.0"),
+            before.replace(f"v{version}", "v99.100.1000"),
+            before.replace(f">Imvault {version}", ">Imvault 99.100.1000"),
             before.replace("https://github.com", "https://example.com"),
             before.replace("data-release", "data-old-release"),
         ):
