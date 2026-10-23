@@ -155,6 +155,17 @@ server.serve_forever()
       check(await release.getAttribute('href')===`https://github.com/airencracken/${app}/releases/tag/v${version}`,`${name} version links to matching release notes`);
     }
   }
+  for (const app of ['imvault', 'witmoot', 'songstead']) {
+    for (const route of ['/', `/${app}/`, `/${app}/docs/`]) {
+      await page.goto(base+route);
+      const docker = page.locator(`[data-container="${app}"]`);
+      check(await docker.count() === 1 && await docker.isVisible(), `${app}: Docker installation is visible on ${route} without JavaScript`);
+      check(await docker.getAttribute('href') === `https://github.com/airencracken/${app}/blob/master/docs/containers.md`, `${app}: Docker installation links to the matching maintained guide`);
+    }
+    const packages = page.getByRole('link', { name: 'Published container images', exact: true });
+    check(await packages.isVisible(), `${app}: published container images are discoverable`);
+    check(await packages.getAttribute('href') === `https://github.com/airencracken/${app}/pkgs/container/${app}`, `${app}: image catalog links to the matching package`);
+  }
   await page.goto(base+'/');
   const ariseRelease=page.getByRole('link',{name:`Arise ${releases.arise}`,exact:true});
   check(await ariseRelease.isVisible(),'Arise release is visible alongside its experimental status');

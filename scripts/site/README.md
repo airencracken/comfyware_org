@@ -115,7 +115,11 @@ The three app cards and product pages show matching version labels and links to
 the exact release notes. The workshop section also shows Arise's release while
 retaining its experimental status. `releases.json` records the currently published stable
 versions; update it with those labels and links during each release. Content
-checks reject missing, duplicate, stale or mismatched release links. Installation
+checks reject missing, duplicate, stale or mismatched release links. Each app card and product page also links directly to the maintained Docker
+Compose guide. Documentation landing pages link to the matching GHCR package
+and explain architecture selection, version pins, and persistent storage. Deploy
+these links and update the release catalog only after the images support anonymous
+pulls. Installation
 guides and the footer's Latest release redirects remain available. Product pages
 describe the purpose, experience, boundaries, installation, and backup approach
 in no more than 650 words. Keep release-specific prose and UI walkthroughs in

@@ -65,13 +65,13 @@ class DeployTests(unittest.TestCase):
                             ignore=shutil.ignore_patterns("node_modules", "__pycache__"))
             shutil.copytree(SITE, checkout / "site")
             broken = checkout / "site/songstead/docs/index.html"
-            broken.write_text(broken.read_text().replace('id="backups"', 'id="missing"'))
+            broken.write_text(broken.read_text().replace('data-container="songstead"', 'data-removed="songstead"'))
             marker = self.target / "existing.html"
             marker.write_text("the currently deployed site")
             result = subprocess.run(["make", "deploy", f"DEPLOY_DIR={self.target}"],
                                     cwd=checkout, capture_output=True, text=True, timeout=60)
             self.assertNotEqual(result.returncode, 0)
-            self.assertIn("expose the backups", result.stderr)
+            self.assertIn("Expected one Docker installation", result.stderr)
             self.assertEqual(tree(self.target), ["existing.html"])
             self.assertEqual(marker.read_text(), "the currently deployed site")
 

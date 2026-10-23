@@ -131,6 +131,27 @@ def release_errors(doc, apps, versions):
     return errors
 
 
+def container_errors(doc, route):
+    """Keep the published-image installation path visible and app-specific."""
+    apps = ("imvault", "witmoot", "songstead") if route == "/" else (route.strip("/").split("/")[0],)
+    if route != "/" and route not in tuple(f"/{app}/{suffix}" for app in apps if app in ("imvault", "witmoot", "songstead") for suffix in ("", "docs/")):
+        return []
+    errors = []
+    links = [(attrs, text.strip()) for attrs, text in doc.links if "data-container" in attrs]
+    if collections.Counter(attrs["data-container"] for attrs, _ in links) != collections.Counter(apps):
+        errors.append("Expected one Docker installation link for each app")
+    for attrs, text in links:
+        app = attrs["data-container"]
+        if (app not in apps or attrs.get("href") != f"https://github.com/airencracken/{app}/blob/master/docs/containers.md"
+                or "Docker Compose" not in text):
+            errors.append("Docker installation link must name and point to the matching maintained guide")
+    if route.endswith("/docs/"):
+        app = apps[0]
+        if f"https://github.com/airencracken/{app}/pkgs/container/{app}" not in {attrs.get("href") for attrs in doc.tags["a"]}:
+            errors.append("Documentation must link to the matching published container package")
+    return errors
+
+
 def editorial_errors(doc, route):
     """Keep product pages brief and operational guides easy to find."""
     errors = []
@@ -169,6 +190,7 @@ def validate_site(root):
         doc = Document(text)
         documents[route] = doc
         errors.extend(f"{route}: {error}" for error in editorial_errors(doc, route))
+        errors.extend(f"{route}: {error}" for error in container_errors(doc, route))
         apps = list(versions) if route == "/" else [route.strip("/")] if route.strip("/") in versions else []
         errors.extend(f"{route}: {error}" for error in release_errors(doc, apps, versions))
         errors.extend(f"{route}: {error}" for error in doc.errors)

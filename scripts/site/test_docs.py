@@ -5,7 +5,7 @@ import shutil
 import tempfile
 import unittest
 
-from test_content import Document, SITE, editorial_errors, validate_site
+from test_content import Document, SITE, container_errors, editorial_errors, validate_site
 
 APPS = ('imvault', 'witmoot', 'songstead')
 
@@ -24,6 +24,48 @@ class DocumentationTests(unittest.TestCase):
                     self.assertEqual([link[0] for link in doc.nav if link[2] == 'page'], [f'/{app}/'])
                 docs = Document((SITE / app / 'docs/index.html').read_text())
                 self.assertIn(f'/{app}/', {attrs.get('href') for attrs in docs.tags['a']})
+
+    def test_published_images_are_discoverable_from_home_products_and_docs(self):
+        for app in APPS:
+            for relative, route in (('index.html', '/'), (f'{app}/index.html', f'/{app}/'),
+                                    (f'{app}/docs/index.html', f'/{app}/docs/')):
+                doc = Document((SITE / relative).read_text())
+                self.assertEqual(container_errors(doc, route), [])
+                link = [attrs for attrs, text in doc.links if attrs.get('data-container') == app]
+                self.assertEqual(len(link), 1)
+                self.assertEqual(link[0]['href'], f'https://github.com/airencracken/{app}/blob/master/docs/containers.md')
+            docs = (SITE / app / 'docs/index.html').read_text()
+            self.assertIn('amd64 or arm64', docs)
+            self.assertIn('version pins', docs)
+            self.assertIn(f'https://github.com/airencracken/{app}/pkgs/container/{app}', docs)
+
+    def test_container_link_schema_rejects_missing_duplicate_and_wrong_app_guides(self):
+        for app in APPS:
+            for relative, route in (('index.html', '/'), (f'{app}/index.html', f'/{app}/'),
+                                    (f'{app}/docs/index.html', f'/{app}/docs/')):
+                text = (SITE / relative).read_text()
+                guide = f'https://github.com/airencracken/{app}/blob/master/docs/containers.md'
+                for before, after in ((f'data-container="{app}"', 'data-removed="gone"'),
+                                      (guide, 'https://github.com/airencracken/other/blob/master/docs/containers.md'),
+                                      (guide, 'javascript:alert(1)'), (guide, '//example.org/install'),
+                                      (guide, 'https://example.org/%2e%2e/install')):
+                    with self.subTest(app=app, route=route, mutation=after):
+                        changed = text.replace(before, after, 1)
+                        self.assertNotEqual(changed, text)
+                        self.assertTrue(container_errors(Document(changed), route))
+                duplicate = f'<a data-container="{app}" href="{guide}">Docker Compose</a>'
+                self.assertTrue(container_errors(Document(text.replace('</main>', duplicate+'</main>')), route))
+            text = (SITE / app / 'docs/index.html').read_text()
+            wrong_package = text.replace(f'/{app}/pkgs/container/{app}', '/other/pkgs/container/other')
+            self.assertTrue(container_errors(Document(wrong_package), f'/{app}/docs/'))
+
+    def test_container_regressions_fail_the_shipping_validator(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / 'site'
+            shutil.copytree(SITE, root)
+            page = root / 'songstead/docs/index.html'
+            page.write_text(page.read_text().replace('data-container="songstead"', 'data-removed="songstead"'))
+            self.assertTrue(any('Expected one Docker' in error for error in validate_site(root)))
 
     def test_docs_schema_rejects_missing_topics_and_maintained_guides(self):
         for app in APPS:
