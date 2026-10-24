@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comfylib · Comfyware</title>
+  <meta name="description" content="The shared Go library behind Imvault, Witmoot, and Songstead. Security tools, backups, invitation availability, and common form styles with standard-library-only Go packages.">
+  <link rel="canonical" href="https://comfyware.org/comfylib/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Comfylib · Comfyware">
+  <meta property="og:description" content="Shared Go packages and interface assets for the Comfyware apps.">
+  <meta property="og:url" content="https://comfyware.org/comfylib/">
+  <meta property="og:image" content="https://comfyware.org/assets/comfy-robot.png">
+  <meta property="og:image:alt" content="A comfy little robot in a green sweater, holding coffee in an armchair">
+  <meta name="theme-color" content="#f7f5ed" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#18221e" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon-64.png" type="image/png" sizes="64x64">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <script src="/assets/theme.js"></script>
+  <link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header wrap">
+    <a class="brand" href="/" aria-label="Comfyware home"><img src="/assets/mark.svg" width="35" height="35" alt=""><span class="wordmark">comfyware</span></a>
+    <nav class="site-nav" aria-label="Main navigation"><a href="/imvault/">Imvault</a><a href="/witmoot/">Witmoot</a><a href="/songstead/">Songstead</a><a href="/principles/">Principles</a><a href="/#sponsor">Sponsor</a></nav>
+    <label class="theme-picker" hidden><span class="visually-hidden">Color theme</span><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+  </header>
+  <main id="main" class="wrap reading-page" tabindex="-1">
+    <a class="back-link" href="/#workshop-heading">Back to Comfyware</a>
+    <section class="hero product-hero" aria-labelledby="welcome">
+      <h1 id="welcome">Comfylib.</h1>
+      <p class="intro">The shared foundation for Imvault, Witmoot, and Songstead.</p>
+      <p>Small Go packages for the things the apps need to get right together: private backups, tokens, trusted proxies, process isolation, and familiar account and invitation forms.</p>
+      <p class="release-version">Current release: <a data-release="comfylib" href="https://github.com/airencracken/comfylib/releases/tag/v0.1.7">Comfylib 0.1.7</a></p>
+      <div class="hero-links"><a class="button" href="https://github.com/airencracken/comfylib">Source and documentation</a><a class="text-link" href="https://pkg.go.dev/github.com/airencracken/comfylib">Go package reference</a></div>
+    </section>
+    <section class="section" aria-labelledby="shared-heading">
+      <h2 id="shared-heading">One implementation, used together.</h2>
+      <p>Comfylib is a Go library used by the Comfyware apps. Its Go packages use only the standard library and add no further modules to your dependency tree. Each app pins an exact published version.</p>
+      <ul>
+        <li><strong>Security tools:</strong> random tokens, session-bound CSRF tokens, trusted client addresses, private key files, transactional mail, and Bubblewrap process confinement.</li>
+        <li><strong>Care for your data:</strong> bounded image normalization, member profile validation, and verified automatic backups with private archives and limited retention.</li>
+        <li><strong>Shared forms:</strong> responsive account and invitation styles, invitation availability, and browser checks for both themes and keyboard access.</li>
+      </ul>
+      <p>Applications own their palettes, templates, permissions, storage, and atomic invitation redemption. The shared library keeps common behavior and checks in one place.</p>
+    </section>
+    <section class="section" aria-labelledby="use-heading">
+      <h2 id="use-heading">Use it in a Go project.</h2>
+      <p>Source builds need Go 1.26 or newer. Pin the release in your project:</p>
+      <pre><code data-module="comfylib">go get github.com/airencracken/comfylib@v0.1.7</code></pre>
+      <p>Choose the packages you need in the <a href="https://github.com/airencracken/comfylib#packages">package guide</a>. Comfylib is licensed under <a href="https://github.com/airencracken/comfylib/blob/v0.1.7/LICENSE">AGPL-3.0-or-later</a>.</p>
+    </section>
+    <section class="section" aria-labelledby="apps-heading">
+      <h2 id="apps-heading">See it at home.</h2>
+      <p>Comfylib supports <a href="/imvault/">Imvault's photo library</a>, <a href="/witmoot/">Witmoot's conversations</a>, and <a href="/songstead/">Songstead's music recommendations</a>. Each app has its own installation guide and runs independently.</p>
+    </section>
+  </main>
+  <footer class="site-footer wrap"><p>Comfyware · A little corner of the internet, together.<br>Made by <a href="https://github.com/airencracken">Marcus</a>.</p><div class="footer-links"><a href="/principles/" aria-current="page">Principles</a><a href="https://github.com/airencracken/comfyware_org">Source</a></div></footer>
+</body>
+</html>

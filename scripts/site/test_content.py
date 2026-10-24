@@ -17,14 +17,14 @@ SITE = Path(__file__).resolve().parents[2] / "site"
 ORIGIN = "https://comfyware.org"
 ROUTES = {"/": "index.html", "/imvault/": "imvault/index.html",
           "/witmoot/": "witmoot/index.html", "/principles/": "principles/index.html",
-          "/songstead/": "songstead/index.html", "/404.html": "404.html",
+          "/songstead/": "songstead/index.html", "/comfylib/": "comfylib/index.html", "/404.html": "404.html",
           **{f"/{app}/docs/": f"{app}/docs/index.html" for app in ("imvault", "witmoot", "songstead")}}
 NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/songstead/", "Songstead"), ("/principles/", "Principles"), ("/#sponsor", "Sponsor")]
 # Bytes a visitor or social preview crawler downloads for one image.
 IMAGE_BUDGET = 200_000
 MASCOT_BUDGETS = {"assets/comfy-robot.webp": 45_000, "assets/comfy-robot.png": 100_000}
 ICON_BUDGET = 64_000
-RELEASE_NAMES = {"imvault": "Imvault", "witmoot": "Witmoot", "songstead": "Songstead", "arise": "Arise"}
+RELEASE_NAMES = {"imvault": "Imvault", "witmoot": "Witmoot", "songstead": "Songstead", "arise": "Arise", "comfylib": "Comfylib"}
 RELEASE_FILE = Path(__file__).with_name("releases.json")
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
 
@@ -177,6 +177,26 @@ def editorial_errors(doc, route):
     return errors
 
 
+
+def library_errors(doc, route, versions):
+    """Keep the shared library discoverable with an exact Go module pin."""
+    links = {attrs.get("href") for attrs in doc.tags["a"]}
+    errors = []
+    if route == "/" and "/comfylib/" not in links:
+        errors.append("Homepage must expose the Comfylib project page")
+    if route == "/comfylib/":
+        expected = f"go get github.com/airencracken/comfylib@v{versions['comfylib']}"
+        commands = [attrs for attrs in doc.tags["code"] if attrs.get("data-module") == "comfylib"]
+        if len(commands) != 1 or expected not in " ".join(doc.main_text):
+            errors.append("Library installation must pin the published Comfylib module")
+        for link in ("https://github.com/airencracken/comfylib", "https://pkg.go.dev/github.com/airencracken/comfylib", "/imvault/", "/witmoot/", "/songstead/"):
+            if link not in links:
+                errors.append("Library page must expose source, reference and companion apps")
+        if any(attrs.get("data-container") for attrs in doc.tags["a"]):
+            errors.append("Library page must describe its Go module installation")
+    return errors
+
+
 def validate_site(root):
     errors = []
     versions = release_versions()
@@ -191,6 +211,7 @@ def validate_site(root):
         documents[route] = doc
         errors.extend(f"{route}: {error}" for error in editorial_errors(doc, route))
         errors.extend(f"{route}: {error}" for error in container_errors(doc, route))
+        errors.extend(f"{route}: {error}" for error in library_errors(doc, route, versions))
         apps = list(versions) if route == "/" else [route.strip("/")] if route.strip("/") in versions else []
         errors.extend(f"{route}: {error}" for error in release_errors(doc, apps, versions))
         errors.extend(f"{route}: {error}" for error in doc.errors)
@@ -312,7 +333,7 @@ def validate_site(root):
 class SiteContractTests(unittest.TestCase):
     def test_all_app_versions_match_their_release_notes(self):
         versions = release_versions()
-        for route in ("index.html", "imvault/index.html", "witmoot/index.html", "songstead/index.html"):
+        for route in ("index.html", "imvault/index.html", "witmoot/index.html", "songstead/index.html", "comfylib/index.html"):
             doc = Document((SITE / route).read_text())
             apps = list(versions) if route == "index.html" else [route.split("/")[0]]
             self.assertEqual(release_errors(doc, apps, versions), [])

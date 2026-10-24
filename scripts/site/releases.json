@@ -1,6 +1,7 @@
 {
-  "imvault": "0.20.2",
-  "witmoot": "0.18.1",
-  "songstead": "0.11.1",
-  "arise": "0.0.42"
+  "imvault": "0.20.4",
+  "witmoot": "0.18.3",
+  "songstead": "0.11.3",
+  "arise": "0.0.42",
+  "comfylib": "0.1.7"
 }

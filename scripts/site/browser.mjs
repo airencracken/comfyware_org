@@ -12,7 +12,7 @@ import { checkThemes } from './themes.mjs';
 
 const root = fileURLToPath(new URL('../../site/', import.meta.url));
 const releases = JSON.parse(await readFile(new URL('./releases.json', import.meta.url), 'utf8'));
-const routes = ['/', '/imvault/', '/witmoot/', '/songstead/', '/principles/', '/imvault/docs/', '/witmoot/docs/', '/songstead/docs/', '/404.html'];
+const routes = ['/', '/imvault/', '/witmoot/', '/songstead/', '/comfylib/', '/principles/', '/imvault/docs/', '/witmoot/docs/', '/songstead/docs/', '/404.html'];
 const screenshotDir = process.env.SCREENSHOT_DIR;
 let server;
 let browser;
@@ -166,7 +166,13 @@ server.serve_forever()
     check(await packages.isVisible(), `${app}: published container images are discoverable`);
     check(await packages.getAttribute('href') === `https://github.com/airencracken/${app}/pkgs/container/${app}`, `${app}: image catalog links to the matching package`);
   }
-  await page.goto(base+'/');
+  await page.goto(base + '/');
+  await page.getByRole('link', { name: 'Explore the library', exact: true }).click();
+  await page.waitForURL('**/comfylib/');
+  check(await page.getByRole('heading', { name: 'Comfylib.', exact: true }).isVisible(), 'Comfylib is discoverable from the homepage');
+  check(await page.locator('[data-module="comfylib"]').innerText() === `go get github.com/airencracken/comfylib@v${releases.comfylib}`, 'Comfylib command pins the current library release');
+  check(await page.getByRole('link', { name: `Comfylib ${releases.comfylib}`, exact: true }).getAttribute('href') === `https://github.com/airencracken/comfylib/releases/tag/v${releases.comfylib}`, 'Comfylib version links to the published release');
+  await page.goto(base + '/');
   const ariseRelease=page.getByRole('link',{name:`Arise ${releases.arise}`,exact:true});
   check(await ariseRelease.isVisible(),'Arise release is visible alongside its experimental status');
   check(await ariseRelease.getAttribute('href')===`https://github.com/airencracken/arise/releases/tag/v${releases.arise}`,'Arise release links to matching notes');

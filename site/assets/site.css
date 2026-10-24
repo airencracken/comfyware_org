@@ -234,3 +234,6 @@ details > p { padding: 0 24px 20px; color: var(--muted); }
   .project-grid { grid-template-columns: 1fr; }
   .project { display: grid; grid-template-columns: 1fr 1fr; }
 }
+
+.reading-page pre { max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.reading-page pre code { font-size: .85rem; }
