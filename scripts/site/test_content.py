@@ -341,18 +341,20 @@ class SiteContractTests(unittest.TestCase):
     def test_release_link_mutations_are_rejected(self):
         versions = release_versions()
         original = (SITE / "index.html").read_text()
-        version = versions["imvault"]
-        before = f'data-release="imvault" href="https://github.com/airencracken/imvault/releases/tag/v{version}">Imvault {version}'
-        self.assertIn(before, original)
-        for after in (
-            before.replace('data-release="imvault"', 'data-release="witmoot"'),
-            before.replace(f"v{version}", "v99.100.1000"),
-            before.replace(f">Imvault {version}", ">Imvault 99.100.1000"),
-            before.replace("https://github.com", "https://example.com"),
-            before.replace("data-release", "data-old-release"),
-        ):
-            with self.subTest(after=after):
-                self.assertTrue(release_errors(Document(original.replace(before, after, 1)), list(versions), versions))
+        for app, name in RELEASE_NAMES.items():
+            version = versions[app]
+            before = f'data-release="{app}" href="https://github.com/airencracken/{app}/releases/tag/v{version}">{name} {version}'
+            self.assertIn(before, original)
+            other_app = "witmoot" if app == "imvault" else "imvault"
+            for after in (
+                before.replace(f'data-release="{app}"', f'data-release="{other_app}"'),
+                before.replace(f"v{version}", "v99.100.1000"),
+                before.replace(f">{name} {version}", f">{name} 99.100.1000"),
+                before.replace("https://github.com", "https://example.com"),
+                before.replace("data-release", "data-old-release"),
+            ):
+                with self.subTest(app=app, after=after):
+                    self.assertTrue(release_errors(Document(original.replace(before, after, 1)), list(versions), versions))
 
     def test_release_manifest_schema_and_version_boundaries(self):
         with tempfile.TemporaryDirectory() as directory:
