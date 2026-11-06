@@ -19,13 +19,13 @@ ROUTES = {"/": "index.html", "/imvault/": "imvault/index.html",
           "/witmoot/": "witmoot/index.html", "/principles/": "principles/index.html",
           "/songstead/": "songstead/index.html", "/comfylib/": "comfylib/index.html", "/404.html": "404.html",
           "/folkweave/": "folkweave/index.html", "/tidings/": "tidings/index.html",
-          **{f"/{app}/docs/": f"{app}/docs/index.html" for app in ("imvault", "witmoot", "songstead")}}
+          **{f"/{app}/docs/": f"{app}/docs/index.html" for app in ("imvault", "witmoot", "songstead", "folkweave", "tidings")}}
 NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/songstead/", "Songstead"), ("/folkweave/", "Folkweave"), ("/tidings/", "Tidings"), ("/principles/", "Principles"), ("/#sponsor", "Sponsor")]
 # Bytes a visitor or social preview crawler downloads for one image.
 IMAGE_BUDGET = 200_000
 MASCOT_BUDGETS = {"assets/comfy-robot.webp": 45_000, "assets/comfy-robot.png": 100_000}
 ICON_BUDGET = 64_000
-RELEASE_NAMES = {"imvault": "Imvault", "witmoot": "Witmoot", "songstead": "Songstead", "arise": "Arise", "comfylib": "Comfylib"}
+RELEASE_NAMES = {"imvault": "Imvault", "witmoot": "Witmoot", "songstead": "Songstead", "arise": "Arise", "comfylib": "Comfylib", "folkweave": "Folkweave", "tidings": "Tidings"}
 RELEASE_FILE = Path(__file__).with_name("releases.json")
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
 
@@ -134,8 +134,8 @@ def release_errors(doc, apps, versions):
 
 def container_errors(doc, route):
     """Keep the published-image installation path visible and app-specific."""
-    apps = ("imvault", "witmoot", "songstead") if route == "/" else (route.strip("/").split("/")[0],)
-    if route != "/" and route not in tuple(f"/{app}/{suffix}" for app in apps if app in ("imvault", "witmoot", "songstead") for suffix in ("", "docs/")):
+    apps = ("imvault", "witmoot", "songstead", "folkweave", "tidings") if route == "/" else (route.strip("/").split("/")[0],)
+    if route != "/" and route not in tuple(f"/{app}/{suffix}" for app in apps if app in ("imvault", "witmoot", "songstead", "folkweave", "tidings") for suffix in ("", "docs/")):
         return []
     errors = []
     links = [(attrs, text.strip()) for attrs, text in doc.links if "data-container" in attrs]
@@ -158,7 +158,7 @@ def editorial_errors(doc, route):
     errors = []
     app = route.strip("/").split("/")[0]
     links = {attrs.get("href") for attrs in doc.tags["a"]}
-    if route == f"/{app}/" and app in ("imvault", "witmoot", "songstead"):
+    if route == f"/{app}/" and app in ("imvault", "witmoot", "songstead", "folkweave", "tidings"):
         if len(" ".join(doc.main_text).split()) > 650:
             errors.append("Product copy exceeds the 650-word budget; move details into documentation")
         if re.search(r"\b[0-9]+\.[0-9]+\.[0-9]+\b", " ".join(doc.prose)):
@@ -198,33 +198,19 @@ def library_errors(doc, route, versions):
     return errors
 
 
-def development_errors(doc, route):
-    """Expose source demos while preserving the new projects' unreleased status."""
-    demos = {"folkweave": "try-it", "tidings": "try-the-demo"}
+def initial_app_errors(doc, route):
+    """Preserve the actual boundaries of the two initial releases."""
     app = route.strip("/")
-    apps = list(demos) if route == "/" else [app] if app in demos else []
-    if not apps:
+    required = {
+        "folkweave": ("parental approval controls are not implemented", "Original uploads are not retained"),
+        "tidings": ("does not scrape full articles", "Stop the service before switching to restored data"),
+    }
+    if app not in required:
         return []
-    errors = []
-    links = {attrs.get("href") for attrs in doc.tags["a"]}
-    markers = [attrs["data-development"] for attrs in doc.tags["p"] if "data-development" in attrs]
-    if collections.Counter(markers) != collections.Counter(apps) or "In development" not in " ".join(doc.main_text):
-        errors.append("Expected one visible development status for each unreleased project")
-    for name in apps:
-        source = f"https://github.com/airencracken/{name}"
-        required = {source, source + "#" + demos[name]}
-        required.add(f"/{name}/" if route == "/" else source + "/issues")
-        if not required.issubset(links):
-            errors.append(f"{name}: Missing source, demo, or project/help link")
-        if any(link and (link.startswith(source + "/releases") or link.startswith(source + "/pkgs/")) for link in links):
-            errors.append(f"{name}: Unreleased project must not advertise published packages")
-    if route != "/":
-        if len(" ".join(doc.main_text).split()) > 650:
-            errors.append("Development product copy exceeds the 650-word budget")
-        for phrase in ({"folkweave": ["parental approval controls are not implemented", "Original uploads are not retained"],
-                        "tidings": ["stop Tidings and copy the entire data directory", "restore with the service stopped"]}[app]):
-            if phrase not in " ".join(doc.main_text):
-                errors.append(f"{app}: Missing current product boundary: {phrase}")
+    text = " ".join(doc.main_text)
+    errors = [f"{app}: Missing current product boundary: {phrase}" for phrase in required[app] if phrase not in text]
+    if any("data-development" in attrs for attrs in doc.tags["p"]):
+        errors.append("Released apps must use their current release link")
     return errors
 
 
@@ -243,7 +229,7 @@ def validate_site(root):
         errors.extend(f"{route}: {error}" for error in editorial_errors(doc, route))
         errors.extend(f"{route}: {error}" for error in container_errors(doc, route))
         errors.extend(f"{route}: {error}" for error in library_errors(doc, route, versions))
-        errors.extend(f"{route}: {error}" for error in development_errors(doc, route))
+        errors.extend(f"{route}: {error}" for error in initial_app_errors(doc, route))
         apps = list(versions) if route == "/" else [route.strip("/")] if route.strip("/") in versions else []
         errors.extend(f"{route}: {error}" for error in release_errors(doc, apps, versions))
         errors.extend(f"{route}: {error}" for error in doc.errors)
@@ -365,7 +351,7 @@ def validate_site(root):
 class SiteContractTests(unittest.TestCase):
     def test_all_app_versions_match_their_release_notes(self):
         versions = release_versions()
-        for route in ("index.html", "imvault/index.html", "witmoot/index.html", "songstead/index.html", "comfylib/index.html"):
+        for route in ("index.html", "imvault/index.html", "witmoot/index.html", "songstead/index.html", "folkweave/index.html", "tidings/index.html", "comfylib/index.html"):
             doc = Document((SITE / route).read_text())
             apps = list(versions) if route == "index.html" else [route.split("/")[0]]
             self.assertEqual(release_errors(doc, apps, versions), [])
@@ -409,7 +395,7 @@ class SiteContractTests(unittest.TestCase):
                     self.assertEqual(release_errors(doc, ["songstead"], versions), [])
 
     def test_product_pages_expose_installation_and_release_routes(self):
-        for app in ("imvault", "witmoot", "songstead"):
+        for app in ("imvault", "witmoot", "songstead", "folkweave", "tidings"):
             with self.subTest(app=app):
                 doc = Document((SITE / app / "index.html").read_text())
                 links = {a.get("href") for a in doc.tags["a"]}

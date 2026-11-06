@@ -12,7 +12,7 @@ import { checkThemes } from './themes.mjs';
 
 const root = fileURLToPath(new URL('../../site/', import.meta.url));
 const releases = JSON.parse(await readFile(new URL('./releases.json', import.meta.url), 'utf8'));
-const routes = ['/', '/imvault/', '/witmoot/', '/songstead/', '/folkweave/', '/tidings/', '/comfylib/', '/principles/', '/imvault/docs/', '/witmoot/docs/', '/songstead/docs/', '/404.html'];
+const routes = ['/', '/imvault/', '/witmoot/', '/songstead/', '/folkweave/', '/tidings/', '/folkweave/docs/', '/tidings/docs/', '/comfylib/', '/principles/', '/imvault/docs/', '/witmoot/docs/', '/songstead/docs/', '/404.html'];
 const screenshotDir = process.env.SCREENSHOT_DIR;
 let server;
 let browser;
@@ -94,9 +94,8 @@ server.serve_forever()
             const box = card.getBoundingClientRect();
             return { top: box.top, width: box.width };
           }));
-          check(cards.length === 3 && cards.every(card => Math.abs(card.width-cards[0].width) < 1 && Math.abs(card.top-cards[0].top) < 1), 'Three equal app cards on desktop');
-          const development = await page.locator('.development-grid .project').evaluateAll(cards => cards.map(card => card.getBoundingClientRect().width));
-          check(development.length === 2 && Math.abs(development[0] - development[1]) < 1, 'Two equal development project cards on desktop');
+          check(cards.length === 5 && cards.every(card => Math.abs(card.width-cards[0].width) < 1) && cards.slice(0,3).every(card => Math.abs(card.top-cards[0].top) < 1) && Math.abs(cards[3].top-cards[4].top) < 1, 'Five equal app cards on desktop');
+
         }
         if (route === '/' || route === '/songstead/') {
           const screenshot = await page.locator('img[src="/assets/songstead-recent.webp"]').evaluate(image => {
@@ -148,7 +147,7 @@ server.serve_forever()
   await page.getByRole('link', { name: 'Meet Songstead' }).click();
   check(new URL(page.url()).pathname === '/songstead/', 'Songstead navigation works without JavaScript');
   check(await page.getByRole('link',{name:`Songstead ${releases.songstead}`,exact:true}).isVisible(), 'Songstead release version is visible');
-  for (const [app,name] of [['imvault','Imvault'],['witmoot','Witmoot'],['songstead','Songstead']]) {
+  for (const [app,name] of [['imvault','Imvault'],['witmoot','Witmoot'],['songstead','Songstead'],['folkweave','Folkweave'],['tidings','Tidings']]) {
     const version = releases[app];
     for (const route of ['/',`/${app}/`]) {
       await page.goto(base+route);
@@ -157,7 +156,7 @@ server.serve_forever()
       check(await release.getAttribute('href')===`https://github.com/airencracken/${app}/releases/tag/v${version}`,`${name} version links to matching release notes`);
     }
   }
-  for (const app of ['imvault', 'witmoot', 'songstead']) {
+  for (const app of ['imvault', 'witmoot', 'songstead', 'folkweave', 'tidings']) {
     for (const route of ['/', `/${app}/`, `/${app}/docs/`]) {
       await page.goto(base+route);
       const docker = page.locator(`[data-container="${app}"]`);
@@ -173,8 +172,9 @@ server.serve_forever()
     await page.goto(base + '/');
     await page.getByRole('link', { name: `Meet ${name}`, exact: true }).click();
     check(new URL(page.url()).pathname === `/${app}/`, `${name}: discoverable without JavaScript`);
-    check(await page.locator(`[data-development="${app}"]`).isVisible(), `${name}: visible development status`);
-    check(await page.getByRole('link', { name: `Try the ${name} demo`, exact: true }).getAttribute('href') === `https://github.com/airencracken/${app}#${app === 'folkweave' ? 'try-it' : 'try-the-demo'}`, `${name}: demo instructions match its README`);
+    check(await page.locator(`[data-release="${app}"]`).isVisible(), `${name}: visible initial release`);
+    await page.getByRole('link', { name: `Get started with ${name}`, exact: true }).click();
+    check(new URL(page.url()).pathname === `/${app}/docs/`, `${name}: installation documentation`);
     await page.getByRole('link', { name: 'Sponsor', exact: true }).click();
     check(new URL(page.url()).pathname === '/' && new URL(page.url()).hash === '#sponsor', `${name}: sponsorship navigation`);
     check(await page.getByRole('link', { name: 'Sponsor on Ko-fi', exact: true }).getAttribute('href') === 'https://ko-fi.com/airencracken', `${name}: existing sponsorship destination`);
@@ -189,7 +189,7 @@ server.serve_forever()
   const ariseRelease=page.getByRole('link',{name:`Arise ${releases.arise}`,exact:true});
   check(await ariseRelease.isVisible(),'Arise release is visible alongside its experimental status');
   check(await ariseRelease.getAttribute('href')===`https://github.com/airencracken/arise/releases/tag/v${releases.arise}`,'Arise release links to matching notes');
-  for (const app of ['imvault', 'witmoot', 'songstead']) {
+  for (const app of ['imvault', 'witmoot', 'songstead', 'folkweave', 'tidings']) {
     await page.goto(base+`/${app}/`);
     await page.getByRole('link', { name: 'Documentation', exact: true }).click();
     check(new URL(page.url()).pathname === `/${app}/docs/`, `${app}: documentation navigation without JavaScript`);

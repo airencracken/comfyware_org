@@ -111,7 +111,7 @@ local sovereignty, accountable hosts, respect for attention, bounded communities
 exit and ownership, and community-defined house rules. These guide product choices;
 they are not a claim that every planned portability feature already exists.
 
-The three released app cards and product pages show matching version labels and links to
+The five released app cards and product pages show matching version labels and links to
 the exact release notes. The workshop section also shows Arise's release while
 retaining its experimental status. `releases.json` records the currently published stable
 versions; update it with those labels and links during each release. Content
@@ -192,16 +192,15 @@ Earlier concepts are kept under `design/mascot-options/`.
 Website code and these project assets use the repository's AGPL-3.0-or-later
 license; see the root `LICENSE`.
 
-## Projects in development
+## Folkweave and Tidings
 
-Folkweave and Tidings have homepage cards under **In development**, product pages
-at `/folkweave/` and `/tidings/`, and links to their maintained README demo,
-source setup, and backup instructions. They have no published packages or
-container images yet, so they are excluded from `releases.json` and do not use
-release or published-image installation links. The content gate protects that
-distinction, Folkweave's current lack of parental approval controls and original
-photo retention, and Tidings' stopped-service backup requirements. Browser and
-HTTP checks cover both routes, their mascots, and sponsorship navigation.
+Folkweave and Tidings have initial 0.1.0 releases, homepage cards alongside the
+other apps, product pages, and five-topic documentation landing pages. Like
+the other apps, each links to current release notes, published container images,
+Linux/Debian installation, service setup, and verified backup/recovery guidance.
+Folkweave's lack of parental approval controls and original photo retention
+remain explicit. Tidings' page now describes transactional JSON import and
+verified online backups. Browser checks cover both apps and sponsorship links.
 
 The existing project mascots are copied into this website as small transparent
 derivatives; no new illustration was generated for these pages:

@@ -240,13 +240,11 @@ details > p { padding: 0 24px 20px; color: var(--muted); }
 
 .project-status { color: var(--rust); font-size: .85rem; margin-top: 20px; }
 .project .project-status { color: var(--rust); }
-.development-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.development-grid .project { display: flex; }
 .project-mascot { width: 100px; height: 106px; object-fit: contain; margin-bottom: 18px; }
 .development-hero { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 50px; align-items: center; max-width: none; }
 .product-mascot { width: 220px; justify-self: center; }
 @media (max-width: 760px) {
-  .development-grid, .development-hero { grid-template-columns: 1fr; }
+  .development-hero { grid-template-columns: 1fr; }
   .development-hero { gap: 28px; }
   .product-mascot { width: 140px; grid-row: 1; justify-self: start; }
 }
