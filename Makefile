@@ -60,6 +60,7 @@ test-content:
 	python3 scripts/site/test_songstead.py
 	python3 scripts/site/test_docs.py
 	python3 scripts/site/test_comfylib.py
+	python3 scripts/site/test_development.py
 
 test-http:
 	python3 scripts/site/test_http.py

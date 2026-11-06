@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Comfyware — Software for your people</title>
-  <meta name="description" content="Small, open-source apps for friends, family, and communities. Photos with Imvault, conversations with Witmoot, and music recommendations with Songstead.">
+  <meta name="description" content="Small, open-source apps for friends, family, and communities. Photos, conversations, music, private timelines, and RSS reading. Discover the released apps and new projects in development.">
   <link rel="canonical" href="https://comfyware.org/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Comfyware — Software for your people">
-  <meta property="og:description" content="A home for photos, conversations, and music from your people. Small, open-source apps for your own corner of the internet.">
+  <meta property="og:description" content="Photos, conversations, music, timelines, and reading for your people. Small, open-source apps for your own corner of the internet.">
   <meta property="og:url" content="https://comfyware.org/">
   <meta property="og:image" content="https://comfyware.org/assets/comfy-robot.png">
   <meta property="og:image:alt" content="A comfy little robot in a green sweater, holding coffee in an armchair">
@@ -23,7 +23,7 @@
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="site-header wrap">
     <a class="brand" href="/" aria-label="Comfyware home"><img src="/assets/mark.svg" width="35" height="35" alt=""><span class="wordmark">comfyware</span></a>
-    <nav class="site-nav" aria-label="Main navigation"><a href="/imvault/">Imvault</a><a href="/witmoot/">Witmoot</a><a href="/songstead/">Songstead</a><a href="/principles/">Principles</a><a href="/#sponsor">Sponsor</a></nav>
+    <nav class="site-nav" aria-label="Main navigation"><a href="/imvault/">Imvault</a><a href="/witmoot/">Witmoot</a><a href="/songstead/">Songstead</a><a href="/folkweave/">Folkweave</a><a href="/tidings/">Tidings</a><a href="/principles/">Principles</a><a href="/#sponsor">Sponsor</a></nav>
     <label class="theme-picker" hidden><span class="visually-hidden">Color theme</span><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
   </header>
   <main id="main" class="wrap" tabindex="-1">
@@ -31,7 +31,7 @@
       <div>
         <p class="eyebrow">Familyware. Friendware. Comfyware.</p>
         <h1 id="welcome">Software for<br><em>your people.</em></h1>
-        <p class="intro">Share photos, keep conversations together, and give music recommendations a home. Open-source apps you can host for friends, family, and small communities.</p>
+        <p class="intro">Share photos, keep conversations together, swap music, follow your reading, and catch up on a private timeline. Open-source apps you can host for friends, family, and small communities.</p>
         <div class="hero-links"><a class="button" href="#software">Explore the apps <span aria-hidden="true">&nbsp;→</span></a><a class="text-link" href="#about">Our approach</a></div>
       </div>
       <img class="mascot" src="/assets/comfy-robot.webp" width="680" height="680" alt="Comfyware's little robot, tucked into an armchair in a green sweater, holding a warm cup of coffee" fetchpriority="high" decoding="async">
@@ -71,6 +71,25 @@
         </article>
       </div>
     </section>
+    <section id="in-development" class="section" aria-labelledby="development-heading">
+      <div class="section-heading"><h2 id="development-heading">In development.</h2><p>Two new projects to try locally.<br>No published packages or images yet.</p></div>
+      <div class="project-grid development-grid">
+        <article class="project" aria-labelledby="folkweave-title">
+          <div class="project-copy"><img class="project-mascot" src="/assets/folkweave-loom.webp" width="256" height="256" alt="Folkweave’s little wooden loom with a woven green, cream, and terracotta panel" loading="lazy" decoding="async">
+            <div class="project-label"><h3 id="folkweave-title">Folkweave</h3><span class="project-kind">Private timeline</span></div>
+            <p>An invite-only timeline for posts, photos, and replies. Everyone in the group shares one audience, with private bookmarks for each member.</p><p class="project-status" data-development="folkweave">In development · Source builds and local demos.</p>
+            <div class="project-links"><a href="/folkweave/">Meet Folkweave <span aria-hidden="true">→</span></a><a href="https://github.com/airencracken/folkweave#try-it">Try the local demo</a><a href="https://github.com/airencracken/folkweave">Source</a></div>
+          </div>
+        </article>
+        <article class="project" aria-labelledby="tidings-title">
+          <div class="project-copy"><img class="project-mascot" src="/assets/tidings-town-crier.webp" width="256" height="270" alt="Tidings’ town crier holding a bell and a scroll" loading="lazy" decoding="async">
+            <div class="project-label"><h3 id="tidings-title">Tidings</h3><span class="project-kind">RSS and Atom reader</span></div>
+            <p>Follow RSS and Atom feeds, organize sources by tags and interests, and save stories. A household can share sources without sharing anyone’s reading state.</p><p class="project-status" data-development="tidings">In development · Source builds and local demos.</p>
+            <div class="project-links"><a href="/tidings/">Meet Tidings <span aria-hidden="true">→</span></a><a href="https://github.com/airencracken/tidings#try-the-demo">Try the local demo</a><a href="https://github.com/airencracken/tidings">Source</a></div>
+          </div>
+        </article>
+      </div>
+    </section>
     <section id="about" class="section" aria-labelledby="about-heading">
       <div class="about-layout">
         <div><p class="eyebrow">Our approach</p><h2 id="about-heading">A smaller sort<br>of internet.</h2></div>
@@ -89,7 +108,7 @@
     <section class="section workshop" aria-labelledby="workshop-heading">
       <div><p class="eyebrow">Around the workshop</p><h2 id="workshop-heading">A few useful tools, too.</h2></div>
       <div class="workshop-links">
-        <div><h3><a href="/comfylib/">Comfylib</a></h3><p>The shared Go library behind Imvault, Witmoot, and Songstead. Common security tools, backups, invitation availability, and form styles, using only the Go standard library.</p><p class="release-version">Current release: <a data-release="comfylib" href="https://github.com/airencracken/comfylib/releases/tag/v0.1.7">Comfylib 0.1.7</a></p><p><a href="/comfylib/">Explore the library</a> · <a href="https://github.com/airencracken/comfylib">Source and documentation</a></p></div>
+        <div><h3><a href="/comfylib/">Comfylib</a></h3><p>The shared Go library behind Imvault, Witmoot, Songstead, Folkweave, and Tidings. Common security tools, backups, invitation availability, and form styles, using only the Go standard library.</p><p class="release-version">Current release: <a data-release="comfylib" href="https://github.com/airencracken/comfylib/releases/tag/v0.1.7">Comfylib 0.1.7</a></p><p><a href="/comfylib/">Explore the library</a> · <a href="https://github.com/airencracken/comfylib">Source and documentation</a></p></div>
         <div><h3><a href="https://github.com/airencracken/arise">Arise <span aria-hidden="true">↗</span></a></h3><p>Experimental Gentoo package tooling in Go. Search, sync, build, and find your way around your system. Compatibility work is ongoing.</p><p class="release-version">Current release: <a data-release="arise" href="https://github.com/airencracken/arise/releases/tag/v0.0.42">Arise 0.0.42</a></p></div>
         <div><h3><a href="https://github.com/airencracken/comfyware#add-the-overlay">The Comfyware Gentoo overlay <span aria-hidden="true">↗</span></a></h3><p>Install Imvault, Witmoot, and Songstead through Portage, with service definitions and the usual system paths.</p></div>
       </div>
@@ -97,7 +116,7 @@
     <section class="section" aria-labelledby="questions-heading">
       <div class="questions"><h2 id="questions-heading">Before you settle in.</h2>
         <details><summary>Can I sign up for an account here?</summary><p>This is the home of the projects. To use them, install an app on a server you manage, or join an installation run by someone you know. Each community has its own accounts and rules.</p></details>
-        <details><summary>Do I need to run every app?</summary><p>Imvault, Witmoot, and Songstead each work on their own. Connect them when you want photos or music to become part of a conversation. Each installation keeps its own accounts and data.</p></details>
+        <details><summary>Do I need to run every app?</summary><p>Imvault, Witmoot, Songstead, Folkweave, and Tidings each work on their own. Imvault and Songstead can connect to Witmoot for conversations. Each installation keeps its own accounts and data.</p></details>
         <details><summary>How can I get involved?</summary><p>Try an app, tell us what worked, report a bug, or help with code and documentation. Each project page links to its repository and installation guides.</p></details>
       </div>
     </section>

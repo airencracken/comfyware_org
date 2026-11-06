@@ -18,8 +18,9 @@ ORIGIN = "https://comfyware.org"
 ROUTES = {"/": "index.html", "/imvault/": "imvault/index.html",
           "/witmoot/": "witmoot/index.html", "/principles/": "principles/index.html",
           "/songstead/": "songstead/index.html", "/comfylib/": "comfylib/index.html", "/404.html": "404.html",
+          "/folkweave/": "folkweave/index.html", "/tidings/": "tidings/index.html",
           **{f"/{app}/docs/": f"{app}/docs/index.html" for app in ("imvault", "witmoot", "songstead")}}
-NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/songstead/", "Songstead"), ("/principles/", "Principles"), ("/#sponsor", "Sponsor")]
+NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/songstead/", "Songstead"), ("/folkweave/", "Folkweave"), ("/tidings/", "Tidings"), ("/principles/", "Principles"), ("/#sponsor", "Sponsor")]
 # Bytes a visitor or social preview crawler downloads for one image.
 IMAGE_BUDGET = 200_000
 MASCOT_BUDGETS = {"assets/comfy-robot.webp": 45_000, "assets/comfy-robot.png": 100_000}
@@ -197,6 +198,36 @@ def library_errors(doc, route, versions):
     return errors
 
 
+def development_errors(doc, route):
+    """Expose source demos while preserving the new projects' unreleased status."""
+    demos = {"folkweave": "try-it", "tidings": "try-the-demo"}
+    app = route.strip("/")
+    apps = list(demos) if route == "/" else [app] if app in demos else []
+    if not apps:
+        return []
+    errors = []
+    links = {attrs.get("href") for attrs in doc.tags["a"]}
+    markers = [attrs["data-development"] for attrs in doc.tags["p"] if "data-development" in attrs]
+    if collections.Counter(markers) != collections.Counter(apps) or "In development" not in " ".join(doc.main_text):
+        errors.append("Expected one visible development status for each unreleased project")
+    for name in apps:
+        source = f"https://github.com/airencracken/{name}"
+        required = {source, source + "#" + demos[name]}
+        required.add(f"/{name}/" if route == "/" else source + "/issues")
+        if not required.issubset(links):
+            errors.append(f"{name}: Missing source, demo, or project/help link")
+        if any(link and (link.startswith(source + "/releases") or link.startswith(source + "/pkgs/")) for link in links):
+            errors.append(f"{name}: Unreleased project must not advertise published packages")
+    if route != "/":
+        if len(" ".join(doc.main_text).split()) > 650:
+            errors.append("Development product copy exceeds the 650-word budget")
+        for phrase in ({"folkweave": ["parental approval controls are not implemented", "Original uploads are not retained"],
+                        "tidings": ["stop Tidings and copy the entire data directory", "restore with the service stopped"]}[app]):
+            if phrase not in " ".join(doc.main_text):
+                errors.append(f"{app}: Missing current product boundary: {phrase}")
+    return errors
+
+
 def validate_site(root):
     errors = []
     versions = release_versions()
@@ -212,6 +243,7 @@ def validate_site(root):
         errors.extend(f"{route}: {error}" for error in editorial_errors(doc, route))
         errors.extend(f"{route}: {error}" for error in container_errors(doc, route))
         errors.extend(f"{route}: {error}" for error in library_errors(doc, route, versions))
+        errors.extend(f"{route}: {error}" for error in development_errors(doc, route))
         apps = list(versions) if route == "/" else [route.strip("/")] if route.strip("/") in versions else []
         errors.extend(f"{route}: {error}" for error in release_errors(doc, apps, versions))
         errors.extend(f"{route}: {error}" for error in doc.errors)
@@ -401,6 +433,7 @@ class SiteContractTests(unittest.TestCase):
             *ROUTES.values(), "assets/site.css", "assets/theme.js", "assets/mark.svg", "assets/comfy-robot.png",
             "assets/comfy-robot.webp", "assets/favicon-64.png", "assets/apple-touch-icon.png", "assets/imvault-gallery.webp",
             "assets/witmoot-board.webp", "assets/imvault-gallery.png", "assets/witmoot-board.png", "assets/songstead-jukebox.png", "assets/songstead-recent.webp", "robots.txt", "sitemap.xml",
+            "assets/folkweave-loom.png", "assets/folkweave-loom.webp", "assets/tidings-town-crier.png", "assets/tidings-town-crier.webp",
         })
 
     def test_mutations_are_rejected(self):
@@ -424,7 +457,7 @@ class SiteContractTests(unittest.TestCase):
             ('content="https://comfyware.org/assets/comfy-robot.png"', 'content="https://comfyware.org/%2e%2e/README.md"', "Broken social preview image"),
             ('width="680"', 'width="681"', "Incorrect image dimensions"),
             ('<a href="/principles/">Principles</a><a href="/#sponsor">', '<a href="/#sponsor">', "Navigation differs"),
-            ('<a href="/witmoot/">Witmoot</a><a href="/songstead/">Songstead</a><a href="/principles/">', '<a href="/witmoot/" aria-current="page">Witmoot</a><a href="/songstead/">Songstead</a><a href="/principles/">', "Navigation differs"),
+            ('<a href="/witmoot/">Witmoot</a><a href="/songstead/">Songstead</a><a href="/folkweave/">', '<a href="/witmoot/" aria-current="page">Witmoot</a><a href="/songstead/">Songstead</a><a href="/folkweave/">', "Navigation differs"),
             ('value="dark"', 'value="unexpected"', "Invalid theme choices"),
             ('class="theme-picker" hidden', 'class="theme-picker"', "Theme control must start hidden"),
             ('<body>', '<body onload="alert(1)">', "Inline code"),

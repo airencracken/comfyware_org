@@ -12,7 +12,7 @@ import { checkThemes } from './themes.mjs';
 
 const root = fileURLToPath(new URL('../../site/', import.meta.url));
 const releases = JSON.parse(await readFile(new URL('./releases.json', import.meta.url), 'utf8'));
-const routes = ['/', '/imvault/', '/witmoot/', '/songstead/', '/comfylib/', '/principles/', '/imvault/docs/', '/witmoot/docs/', '/songstead/docs/', '/404.html'];
+const routes = ['/', '/imvault/', '/witmoot/', '/songstead/', '/folkweave/', '/tidings/', '/comfylib/', '/principles/', '/imvault/docs/', '/witmoot/docs/', '/songstead/docs/', '/404.html'];
 const screenshotDir = process.env.SCREENSHOT_DIR;
 let server;
 let browser;
@@ -85,16 +85,18 @@ server.serve_forever()
         });
         check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${route}: overflow at ${width}px`);
         check(await page.locator('h1').count() === 1, `${route}: one main heading`);
-        if (['/imvault/', '/witmoot/', '/songstead/'].includes(route)) {
+        if (['/imvault/', '/witmoot/', '/songstead/', '/folkweave/', '/tidings/'].includes(route)) {
           const height = await page.evaluate(() => document.documentElement.scrollHeight);
           check(height < (width >= 1100 ? 4300 : 6000), `${route}: product page length at ${width}px (${height}px)`);
         }
         if (route === '/' && width === 1440) {
-          const cards = await page.locator('.project').evaluateAll(cards => cards.map(card => {
+          const cards = await page.locator('#software .project').evaluateAll(cards => cards.map(card => {
             const box = card.getBoundingClientRect();
             return { top: box.top, width: box.width };
           }));
           check(cards.length === 3 && cards.every(card => Math.abs(card.width-cards[0].width) < 1 && Math.abs(card.top-cards[0].top) < 1), 'Three equal app cards on desktop');
+          const development = await page.locator('.development-grid .project').evaluateAll(cards => cards.map(card => card.getBoundingClientRect().width));
+          check(development.length === 2 && Math.abs(development[0] - development[1]) < 1, 'Two equal development project cards on desktop');
         }
         if (route === '/' || route === '/songstead/') {
           const screenshot = await page.locator('img[src="/assets/songstead-recent.webp"]').evaluate(image => {
@@ -165,6 +167,17 @@ server.serve_forever()
     const packages = page.getByRole('link', { name: 'Published container images', exact: true });
     check(await packages.isVisible(), `${app}: published container images are discoverable`);
     check(await packages.getAttribute('href') === `https://github.com/airencracken/${app}/pkgs/container/${app}`, `${app}: image catalog links to the matching package`);
+  }
+  await page.goto(base + '/');
+  for (const [app, name] of [['folkweave', 'Folkweave'], ['tidings', 'Tidings']]) {
+    await page.goto(base + '/');
+    await page.getByRole('link', { name: `Meet ${name}`, exact: true }).click();
+    check(new URL(page.url()).pathname === `/${app}/`, `${name}: discoverable without JavaScript`);
+    check(await page.locator(`[data-development="${app}"]`).isVisible(), `${name}: visible development status`);
+    check(await page.getByRole('link', { name: `Try the ${name} demo`, exact: true }).getAttribute('href') === `https://github.com/airencracken/${app}#${app === 'folkweave' ? 'try-it' : 'try-the-demo'}`, `${name}: demo instructions match its README`);
+    await page.getByRole('link', { name: 'Sponsor', exact: true }).click();
+    check(new URL(page.url()).pathname === '/' && new URL(page.url()).hash === '#sponsor', `${name}: sponsorship navigation`);
+    check(await page.getByRole('link', { name: 'Sponsor on Ko-fi', exact: true }).getAttribute('href') === 'https://ko-fi.com/airencracken', `${name}: existing sponsorship destination`);
   }
   await page.goto(base + '/');
   await page.getByRole('link', { name: 'Explore the library', exact: true }).click();

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tidings — RSS and Atom reader · Comfyware</title>
+  <meta name="description" content="Follow RSS and Atom feeds, organize sources by tags and interests, and save stories. A household can share sources without sharing anyone’s reading state.">
+  <link rel="canonical" href="https://comfyware.org/tidings/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Tidings — RSS and Atom reader">
+  <meta property="og:description" content="Follow RSS and Atom feeds, organize sources by tags and interests, and save stories. A household can share sources without sharing anyone’s reading state.">
+  <meta property="og:url" content="https://comfyware.org/tidings/">
+  <meta property="og:image" content="https://comfyware.org/assets/tidings-town-crier.png">
+  <meta property="og:image:alt" content="Tidings’ town crier holding a bell and a scroll">
+  <meta name="theme-color" content="#f7f5ed" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#18221e" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/favicon-64.png" type="image/png" sizes="64x64">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <script src="/assets/theme.js"></script>
+  <link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header wrap"><a class="brand" href="/" aria-label="Comfyware home"><img src="/assets/mark.svg" width="35" height="35" alt=""><span class="wordmark">comfyware</span></a><nav class="site-nav" aria-label="Main navigation"><a href="/imvault/">Imvault</a><a href="/witmoot/">Witmoot</a><a href="/songstead/">Songstead</a><a href="/folkweave/">Folkweave</a><a href="/tidings/" aria-current="page">Tidings</a><a href="/principles/">Principles</a><a href="/#sponsor">Sponsor</a></nav>
+    <label class="theme-picker" hidden><span class="visually-hidden">Color theme</span><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></header>
+  <main id="main" class="wrap" tabindex="-1">
+    <a class="back-link" href="/#in-development">All our software</a>
+    <section class="hero product-hero development-hero" aria-labelledby="welcome">
+      <div><h1 id="welcome">Follow the sources you choose.</h1><p class="intro">A self-hosted RSS and Atom reader for you and your people. Read a finite page, save something worthwhile, and put it down. Your subscriptions and reading state stay your own.</p>
+        <p class="project-status" data-development="tidings">In development · Source builds and local demos. No published packages or container images yet.</p>
+        <div class="hero-links"><a class="button" href="https://github.com/airencracken/tidings#try-the-demo">Try the Tidings demo</a><a class="text-link" href="https://github.com/airencracken/tidings">Explore the source</a></div>
+      </div>
+      <img class="product-mascot" src="/assets/tidings-town-crier.webp" width="256" height="270" alt="Tidings’ town crier holding a bell and a scroll" decoding="async">
+    </section>
+    <section class="section" aria-labelledby="features-heading"><div class="section-heading"><h2 id="features-heading">What you can do today.</h2></div><div class="features">
+      <div><h3>Your own reading list</h3><p>Follow RSS and Atom addresses, organize sources with tags, and create handpicked or tag-based feed groups. OPML import and export let you bring subscriptions with you.</p></div>
+      <div><h3>An optional household table</h3><p>Hosts can maintain shared sources and feed groups. Following the household table is off by default for everyone. Opt in or leave when you choose; personal subscriptions stay personal.</p></div>
+      <div><h3>Reading state belongs to you</h3><p>Read markers and saved stories are individual, even for shared sources. Opening a story does not mark it read automatically. Use the explicit action when you are finished.</p></div>
+      <div><h3>Plain text, finite pages</h3><p>Read the text supplied in a publisher’s feed without remote images, scripts, or automatic embeds. Open the original for more. Ordinary forms and navigation work with JavaScript disabled.</p></div>
+    </div></section>
+    <section class="section" aria-labelledby="scope-heading"><h2 id="scope-heading">Current limits.</h2><p>Tidings reads the content supplied by feeds; it does not scrape full articles. The JSON reading-state export is a portable record, and importing it is not implemented. For a complete backup, stop Tidings and copy the entire data directory; restore with the service stopped.</p></section>
+    <section id="start" class="section" aria-labelledby="start-heading"><h2 id="start-heading">Try it locally.</h2><p>Build with Go 1.26 or newer and follow the <a href="https://github.com/airencracken/tidings#try-the-demo">disposable demo instructions</a>. The demo runs on localhost with fictional sample content and its own temporary database. It removes that data when you stop it.</p><p>For your own installation, use the <a href="https://github.com/airencracken/tidings#start-here">source setup guide</a> and read the <a href="https://github.com/airencracken/tidings#own-your-reading-life">backup and export guidance</a>. Keep the application behind HTTPS when sharing it online.</p></section>
+    <aside class="other-project"><p>Tidings is one of the independent Comfyware apps.</p><a class="text-link" href="/#software">Explore the other apps</a></aside>
+  </main>
+  <footer class="site-footer wrap"><p>Tidings is part of Comfyware.<br>Made by <a href="https://github.com/airencracken">Marcus</a>.</p><div class="footer-links"><a href="https://github.com/airencracken/tidings#readme">Documentation</a><a href="https://github.com/airencracken/tidings/issues">Help &amp; bugs</a><a href="/principles/">Principles</a><a href="/">All our software</a></div></footer>
+</body>
+</html>

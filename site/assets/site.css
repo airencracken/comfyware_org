@@ -211,7 +211,7 @@ details > p { padding: 0 24px 20px; color: var(--muted); }
 @media (max-width: 440px) {
   .principles, .features { grid-template-columns: 1fr; }
   .project-label { align-items: start; flex-direction: column; gap: 3px; }
-  .site-nav { width: 100%; justify-content: space-between; gap: 12px; }
+  .site-nav { width: 100%; justify-content: flex-start; gap: 4px 18px; }
   .project-kind { font-size: .66rem; }
 }
 @media print {
@@ -237,3 +237,16 @@ details > p { padding: 0 24px 20px; color: var(--muted); }
 
 .reading-page pre { max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
 .reading-page pre code { font-size: .85rem; }
+
+.project-status { color: var(--rust); font-size: .85rem; margin-top: 20px; }
+.project .project-status { color: var(--rust); }
+.development-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.development-grid .project { display: flex; }
+.project-mascot { width: 100px; height: 106px; object-fit: contain; margin-bottom: 18px; }
+.development-hero { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 50px; align-items: center; max-width: none; }
+.product-mascot { width: 220px; justify-self: center; }
+@media (max-width: 760px) {
+  .development-grid, .development-hero { grid-template-columns: 1fr; }
+  .development-hero { gap: 28px; }
+  .product-mascot { width: 140px; grid-row: 1; justify-self: start; }
+}

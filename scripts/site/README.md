@@ -111,7 +111,7 @@ local sovereignty, accountable hosts, respect for attention, bounded communities
 exit and ownership, and community-defined house rules. These guide product choices;
 they are not a claim that every planned portability feature already exists.
 
-The three app cards and product pages show matching version labels and links to
+The three released app cards and product pages show matching version labels and links to
 the exact release notes. The workshop section also shows Arise's release while
 retaining its experimental status. `releases.json` records the currently published stable
 versions; update it with those labels and links during each release. Content
@@ -126,7 +126,7 @@ in no more than 650 words. Keep release-specific prose and UI walkthroughs in
 the app's documentation and release notes. The Arise description deliberately calls out its experimental
 status. Application accounts live on their individual installations.
 
-Each app has a documentation landing page at `/<app>/docs/`, linked from its
+Each released app has a documentation landing page at `/<app>/docs/`, linked from its
 home card, product page and footer. The five topics are installation,
 configuration, backups/recovery, upgrades, and help. These pages link to the
 guides maintained alongside each app rather than copying commands into this
@@ -191,3 +191,32 @@ artwork is preserved outside the public site; see the
 Earlier concepts are kept under `design/mascot-options/`.
 Website code and these project assets use the repository's AGPL-3.0-or-later
 license; see the root `LICENSE`.
+
+## Projects in development
+
+Folkweave and Tidings have homepage cards under **In development**, product pages
+at `/folkweave/` and `/tidings/`, and links to their maintained README demo,
+source setup, and backup instructions. They have no published packages or
+container images yet, so they are excluded from `releases.json` and do not use
+release or published-image installation links. The content gate protects that
+distinction, Folkweave's current lack of parental approval controls and original
+photo retention, and Tidings' stopped-service backup requirements. Browser and
+HTTP checks cover both routes, their mascots, and sponsorship navigation.
+
+The existing project mascots are copied into this website as small transparent
+derivatives; no new illustration was generated for these pages:
+
+- `assets/folkweave-loom.webp` is the app's 256 × 256 asset at Folkweave commit
+  `f26c0d6`. Its companion PNG is resized from that repository's preserved
+  `design/mascot/loom-original.png`, with a 256-color palette. The generation
+  prompt remains in Folkweave's `docs/mascot.md`.
+- `assets/tidings-town-crier.webp` and `.png` are 256 × 270 derivatives of
+  Tidings' `internal/reader/static/town-crier.png` at `9a6ab00`. The prompt remains
+  in Tidings' `docs/town-crier-prompt.txt`. The PNG is also the README derivative
+  in Tidings' `docs/images/town-crier.png`.
+
+Derivatives use ImageMagick `-resize 256x -strip`, WebP quality 85 with
+`-define webp:method=6`, or PNG `-colors 256 -define png:compression-level=9`.
+Each website derivative is under 25,000 bytes; the normal image checks also
+validate dimensions and local-only serving. Original artwork stays in its app
+repository, outside the public website.
