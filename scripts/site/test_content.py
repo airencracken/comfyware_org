@@ -209,8 +209,25 @@ def initial_app_errors(doc, route):
         return []
     text = " ".join(doc.main_text)
     errors = [f"{app}: Missing current product boundary: {phrase}" for phrase in required[app] if phrase not in text]
+    errors.extend(project_screenshot_errors(doc, [app]))
     if any("data-development" in attrs for attrs in doc.tags["p"]):
         errors.append("Released apps must use their current release link")
+    return errors
+
+
+def project_screenshot_errors(doc, apps):
+    errors = []
+    filenames = {"folkweave": "folkweave-timeline.webp", "tidings": "tidings-reader.webp"}
+    for app in apps:
+        images = [attrs for attrs in doc.tags["img"] if attrs.get("data-screenshot") == app]
+        if len(images) != 1:
+            errors.append(f"{app}: Expected one application screenshot")
+            continue
+        attrs = images[0]
+        if (attrs.get("src") != "/assets/" + filenames[app]
+                or attrs.get("width") != "1280" or attrs.get("height") != "1000"
+                or not attrs.get("alt", "").strip()):
+            errors.append(f"{app}: Screenshot needs its local asset, dimensions, and description")
     return errors
 
 
@@ -230,6 +247,8 @@ def validate_site(root):
         errors.extend(f"{route}: {error}" for error in container_errors(doc, route))
         errors.extend(f"{route}: {error}" for error in library_errors(doc, route, versions))
         errors.extend(f"{route}: {error}" for error in initial_app_errors(doc, route))
+        if route == "/":
+            errors.extend(f"{route}: {error}" for error in project_screenshot_errors(doc, ["folkweave", "tidings"]))
         apps = list(versions) if route == "/" else [route.strip("/")] if route.strip("/") in versions else []
         errors.extend(f"{route}: {error}" for error in release_errors(doc, apps, versions))
         errors.extend(f"{route}: {error}" for error in doc.errors)
@@ -419,6 +438,7 @@ class SiteContractTests(unittest.TestCase):
             *ROUTES.values(), "assets/site.css", "assets/theme.js", "assets/mark.svg", "assets/comfy-robot.png",
             "assets/comfy-robot.webp", "assets/favicon-64.png", "assets/apple-touch-icon.png", "assets/imvault-gallery.webp",
             "assets/witmoot-board.webp", "assets/imvault-gallery.png", "assets/witmoot-board.png", "assets/songstead-jukebox.png", "assets/songstead-recent.webp", "robots.txt", "sitemap.xml",
+            "assets/folkweave-timeline.webp", "assets/tidings-reader.webp",
             "assets/folkweave-loom.png", "assets/folkweave-loom.webp", "assets/tidings-town-crier.png", "assets/tidings-town-crier.webp",
         })
 
