@@ -11,6 +11,17 @@ APPS = ('imvault', 'witmoot', 'songstead')
 
 
 class DocumentationTests(unittest.TestCase):
+    def test_all_five_apps_explain_the_common_setup_interface(self):
+        for app in (*APPS, 'folkweave', 'tidings'):
+            with self.subTest(app=app):
+                page = (SITE / app / 'docs/index.html').read_text()
+                for command in (f'sudo {app} setup', f'sudo {app} create-owner --username yourname',
+                                f'sudo {app} set-password --username yourname'):
+                    self.assertIn(command, page)
+                for source in ('--password-stdin', '--password-file PATH', '--data-dir DIRECTORY'):
+                    self.assertIn(source, page)
+                self.assertIn(f'https://github.com/airencracken/{app}/blob/master/docs/setup.md', page)
+
     def test_each_app_has_a_discoverable_docs_page(self):
         home = Document((SITE / 'index.html').read_text())
         home_links = {attrs.get('href') for attrs in home.tags['a']}

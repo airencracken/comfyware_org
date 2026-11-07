@@ -199,16 +199,16 @@ def library_errors(doc, route, versions):
 
 
 def initial_app_errors(doc, route):
-    """Preserve the actual boundaries of the two initial releases."""
+    """Preserve accurate product descriptions for the two newer apps."""
     app = route.strip("/")
     required = {
         "folkweave": ("parental approval controls are not implemented", "Original uploads are not retained"),
-        "tidings": ("does not scrape full articles", "Stop the service before switching to restored data"),
+        "tidings": ("pictures supplied by feeds", "A live indicator shows progress"),
     }
     if app not in required:
         return []
     text = " ".join(doc.main_text)
-    errors = [f"{app}: Missing current product boundary: {phrase}" for phrase in required[app] if phrase not in text]
+    errors = [f"{app}: Missing current product detail: {phrase}" for phrase in required[app] if phrase not in text]
     errors.extend(project_screenshot_errors(doc, [app]))
     if any("data-development" in attrs for attrs in doc.tags["p"]):
         errors.append("Released apps must use their current release link")

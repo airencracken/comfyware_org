@@ -37,7 +37,7 @@ class InitialAppTests(unittest.TestCase):
             original = (SITE / app / "index.html").read_text()
             source = "https://github.com/airencracken/" + app
             mutations = [
-                ("parental approval controls are not implemented" if app == "folkweave" else "Stop the service before switching to restored data", "future work"),
+                ("parental approval controls are not implemented" if app == "folkweave" else "A live indicator shows progress", "future work"),
             ]
             for before, after in mutations:
                 with self.subTest(app=app, mutation=after):
