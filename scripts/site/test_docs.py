@@ -152,5 +152,17 @@ class DocumentationTests(unittest.TestCase):
         self.assertIn('https://github.com/airencracken/comfyware_org/issues', home)
 
 
+class ConfigurationConventionTests(unittest.TestCase):
+    def test_all_app_guides_link_the_shared_convention_and_native_paths(self):
+        root = Path(__file__).resolve().parents[2] / 'site'
+        link = 'https://github.com/airencracken/comfylib/blob/master/docs/configuration.md'
+        for app in ('imvault', 'witmoot', 'songstead', 'folkweave', 'tidings'):
+            with self.subTest(app=app):
+                text = (root / app / 'docs/index.html').read_text()
+                for expected in (link, 'KEY="value"', '/etc/conf.d/' + app,
+                                 '/etc/' + app + '/' + app + '.env'):
+                    self.assertIn(expected, text)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)
