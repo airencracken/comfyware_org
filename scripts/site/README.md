@@ -219,3 +219,23 @@ Derivatives use ImageMagick `-resize 256x -strip`, WebP quality 85 with
 Each website derivative is under 25,000 bytes; the normal image checks also
 validate dimensions and local-only serving. Original artwork stays in its app
 repository, outside the public website.
+
+## App mascots
+
+All five app cards and product headers display their app's existing mascot.
+Cards use a consistent 100 by 106 pixel box with `object-fit: contain`;
+product artwork is 220 pixels wide beside the copy on desktop, or 140 pixels
+wide above the copy on mobile. Keep the `data-mascot` identifier on each image
+so content and browser checks can catch missing or swapped artwork.
+
+The three additional transparent WebP derivatives are:
+
+- `assets/imvault-keeper.webp`: Imvault `internal/web/static/img/mascot.png` at `aeb503abfc9f1345653ca5be2939e6185296abc3`.
+- `assets/witmoot-knight.webp`: Witmoot `internal/forum/static/moot-knight.png` at `d33a1e5cd90856bd693d23eb30aab16f80241163`.
+- `assets/songstead-jukebox.webp`: the existing `assets/songstead-jukebox.png`
+  already preserved in this website.
+
+To reproduce these derivatives with Pillow, convert the source to RGBA, use
+`thumbnail((256, 256), Image.Resampling.LANCZOS)`, and save as WebP with
+`quality=90, method=6`. Each app mascot has a 25,000-byte download budget,
+with intrinsic dimensions checked against the HTML. No new artwork is generated.

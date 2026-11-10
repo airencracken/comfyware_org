@@ -12,6 +12,7 @@ import { checkThemes } from './themes.mjs';
 
 const root = fileURLToPath(new URL('../../site/', import.meta.url));
 const releases = JSON.parse(await readFile(new URL('./releases.json', import.meta.url), 'utf8'));
+const mascots = { imvault: 'imvault-keeper', witmoot: 'witmoot-knight', songstead: 'songstead-jukebox', folkweave: 'folkweave-loom', tidings: 'tidings-town-crier' };
 const routes = ['/', '/imvault/', '/witmoot/', '/songstead/', '/folkweave/', '/tidings/', '/folkweave/docs/', '/tidings/docs/', '/comfylib/', '/principles/', '/imvault/docs/', '/witmoot/docs/', '/songstead/docs/', '/404.html'];
 const screenshotDir = process.env.SCREENSHOT_DIR;
 let server;
@@ -67,6 +68,24 @@ server.serve_forever()
     check(result.width === 680 && result.height === 680, `${asset}: decodes at intended resolution`);
     check(result.corner === 0 && result.center >= 250, `${asset}: transparent margin and visible artwork`);
   }
+  for (const [app, filename] of Object.entries(mascots)) {
+    const result = await assetPage.evaluate(async filename => {
+      const response = await fetch(`/assets/${filename}.webp`);
+      const blob = await response.blob();
+      const image = await createImageBitmap(blob);
+      const canvas = document.createElement('canvas');
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(image, 0, 0);
+      return { ok: response.ok, bytes: blob.size, width: image.width, height: image.height,
+        corner: ctx.getImageData(0, 0, 1, 1).data[3],
+        center: ctx.getImageData(image.width / 2, image.height / 2, 1, 1).data[3] };
+    }, filename);
+    check(result.ok && result.bytes <= 25000, `${app}: mascot download budget`);
+    check(result.width === 256 && result.height === (app === 'tidings' ? 270 : 256), `${app}: mascot intrinsic dimensions`);
+    check(result.corner === 0 && result.center > 0, `${app}: transparent margin and visible mascot`);
+  }
   await assetPage.close();
   if (screenshotDir) await mkdir(screenshotDir, { recursive: true });
   for (const colorScheme of ['light', 'dark']) {
@@ -85,6 +104,28 @@ server.serve_forever()
         });
         check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${route}: overflow at ${width}px`);
         check(await page.locator('h1').count() === 1, `${route}: one main heading`);
+        if (route === '/') {
+          check(await page.locator('#software .project-mascot').count() === 5, 'Every app card has its mascot');
+          for (const [app, filename] of Object.entries(mascots)) {
+            const image = page.locator(`.project[aria-labelledby="${app}-title"] .project-mascot[data-mascot="${app}"]`);
+            check(await image.count() === 1 && await image.isVisible(), `${app}: visible mascot in its home card`);
+            check(await image.getAttribute('src') === `/assets/${filename}.webp`, `${app}: correct home mascot artwork`);
+            const box = await image.boundingBox();
+            check(box.width === 100 && box.height === 106, `${app}: consistent home mascot size at ${width}px`);
+          }
+        }
+        const app = route.split('/')[1];
+        if (route === `/${app}/` && app in mascots) {
+          const hero = page.locator('.product-hero.with-mascot');
+          const image = hero.locator(`:scope > .product-mascot[data-mascot="${app}"]`);
+          check(await image.count() === 1 && await image.isVisible(), `${app}: visible product mascot`);
+          check(await image.getAttribute('src') === `/assets/${mascots[app]}.webp`, `${app}: correct product mascot artwork`);
+          const box = await image.boundingBox();
+          const copy = await hero.locator(':scope > div').boundingBox();
+          check(box.width === (width <= 760 ? 140 : 220), `${app}: consistent product mascot size at ${width}px`);
+          check(width <= 760 ? box.y + box.height <= copy.y : box.x >= copy.x + copy.width,
+            `${app}: mascot above copy on mobile and beside copy on desktop`);
+        }
         if (['/imvault/', '/witmoot/', '/songstead/', '/folkweave/', '/tidings/'].includes(route)) {
           const height = await page.evaluate(() => document.documentElement.scrollHeight);
           check(height < (width >= 1100 ? 4300 : 6000), `${route}: product page length at ${width}px (${height}px)`);

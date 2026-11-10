@@ -23,7 +23,15 @@ ROUTES = {"/": "index.html", "/imvault/": "imvault/index.html",
 NAV = [("/imvault/", "Imvault"), ("/witmoot/", "Witmoot"), ("/songstead/", "Songstead"), ("/folkweave/", "Folkweave"), ("/tidings/", "Tidings"), ("/principles/", "Principles"), ("/#sponsor", "Sponsor")]
 # Bytes a visitor or social preview crawler downloads for one image.
 IMAGE_BUDGET = 200_000
+PROJECT_MASCOTS = {
+    "imvault": ("imvault-keeper.webp", "256", "256"),
+    "witmoot": ("witmoot-knight.webp", "256", "256"),
+    "songstead": ("songstead-jukebox.webp", "256", "256"),
+    "folkweave": ("folkweave-loom.webp", "256", "256"),
+    "tidings": ("tidings-town-crier.webp", "256", "270"),
+}
 MASCOT_BUDGETS = {"assets/comfy-robot.webp": 45_000, "assets/comfy-robot.png": 100_000}
+MASCOT_BUDGETS.update({"assets/" + filename: 25_000 for filename, _, _ in PROJECT_MASCOTS.values()})
 ICON_BUDGET = 64_000
 RELEASE_NAMES = {"imvault": "Imvault", "witmoot": "Witmoot", "songstead": "Songstead", "arise": "Arise", "comfylib": "Comfylib", "folkweave": "Folkweave", "tidings": "Tidings"}
 RELEASE_FILE = Path(__file__).with_name("releases.json")
@@ -231,6 +239,31 @@ def project_screenshot_errors(doc, apps):
     return errors
 
 
+def project_mascot_errors(doc, route):
+    """Require the matching app artwork on every home card and product hero."""
+    apps = list(PROJECT_MASCOTS) if route == "/" else [route.strip("/")] if route.strip("/") in PROJECT_MASCOTS else []
+    if not apps:
+        return []
+    errors = []
+    images = [attrs for attrs in doc.tags["img"] if "data-mascot" in attrs]
+    if collections.Counter(attrs["data-mascot"] for attrs in images) != collections.Counter(apps):
+        errors.append("Expected one matching mascot for each app")
+    expected_class = "project-mascot" if route == "/" else "product-mascot"
+    for attrs in images:
+        app = attrs["data-mascot"]
+        if app not in PROJECT_MASCOTS:
+            continue
+        filename, width, height = PROJECT_MASCOTS[app]
+        description = attrs.get("alt", "").strip()
+        if (attrs.get("src") != "/assets/" + filename
+                or (attrs.get("width"), attrs.get("height")) != (width, height)
+                or expected_class not in attrs.get("class", "").split()
+                or not description.startswith(app.capitalize())
+                or len(description) <= len(app) + 8):
+            errors.append(f"{app}: Mascot needs matching local artwork, dimensions, class, and description")
+    return errors
+
+
 def validate_site(root):
     errors = []
     versions = release_versions()
@@ -247,6 +280,7 @@ def validate_site(root):
         errors.extend(f"{route}: {error}" for error in container_errors(doc, route))
         errors.extend(f"{route}: {error}" for error in library_errors(doc, route, versions))
         errors.extend(f"{route}: {error}" for error in initial_app_errors(doc, route))
+        errors.extend(f"{route}: {error}" for error in project_mascot_errors(doc, route))
         if route == "/":
             errors.extend(f"{route}: {error}" for error in project_screenshot_errors(doc, ["folkweave", "tidings"]))
         apps = list(versions) if route == "/" else [route.strip("/")] if route.strip("/") in versions else []
@@ -440,6 +474,7 @@ class SiteContractTests(unittest.TestCase):
             "assets/witmoot-board.webp", "assets/imvault-gallery.png", "assets/witmoot-board.png", "assets/songstead-jukebox.png", "assets/songstead-recent.webp", "robots.txt", "sitemap.xml",
             "assets/folkweave-timeline.webp", "assets/tidings-reader.webp",
             "assets/folkweave-loom.png", "assets/folkweave-loom.webp", "assets/tidings-town-crier.png", "assets/tidings-town-crier.webp",
+            "assets/imvault-keeper.webp", "assets/witmoot-knight.webp", "assets/songstead-jukebox.webp",
         })
 
     def test_mutations_are_rejected(self):
@@ -489,7 +524,7 @@ class SiteContractTests(unittest.TestCase):
                 shutil.copytree(SITE, root)
                 path = root / relative
                 original = path.read_bytes()
-                self.assertEqual(image_size(path), (680, 680))
+                self.assertIsNotNone(image_size(path))
                 for size in (budget, budget + 1):
                     path.write_bytes(original + bytes(size - len(original)))
                     self.assertEqual(any("Mascot exceeds download budget" in error
@@ -512,6 +547,54 @@ class ImageSizeTests(unittest.TestCase):
             path.write_bytes(b"GIF89a" + bytes(40))
             self.assertIsNone(image_size(path))
 
+
+
+class ProjectMascotTests(unittest.TestCase):
+    def test_all_five_apps_have_matching_mascots(self):
+        for route in ["/", *(f"/{app}/" for app in PROJECT_MASCOTS)]:
+            with self.subTest(route=route):
+                text = (SITE / ROUTES[route]).read_text()
+                self.assertEqual(project_mascot_errors(Document(text), route), [])
+
+    def test_missing_duplicate_swapped_and_adversarial_images_are_rejected(self):
+        for app, (filename, width, height) in PROJECT_MASCOTS.items():
+            for route, css_class in (("/", "project-mascot"), (f"/{app}/", "product-mascot")):
+                text = (SITE / ROUTES[route]).read_text()
+                image = re.search(r'<img\b[^>]*data-mascot="' + app + r'"[^>]*>', text)[0]
+                wrong = next(value[0] for key, value in PROJECT_MASCOTS.items() if key != app)
+                mutations = ["", image + image,
+                             image.replace('data-mascot="' + app + '"', 'data-mascot="unknown"'),
+                             image.replace(filename, wrong),
+                             image.replace('/assets/' + filename, 'https://example.org/' + filename),
+                             image.replace('/assets/' + filename, '/assets/../' + filename),
+                             image.replace('width="' + width + '"', 'width="1"'),
+                             image.replace('height="' + height + '"', 'height="1"'),
+                             re.sub(r'alt="[^"]*"', 'alt=""', image),
+                             image.replace(css_class, 'missing-mascot-class')]
+                for index, replacement in enumerate(mutations):
+                    with self.subTest(app=app, route=route, mutation=index):
+                        changed = text.replace(image, replacement, 1)
+                        self.assertTrue(project_mascot_errors(Document(changed), route))
+
+    def test_missing_mascots_and_artwork_fail_the_deploy_gate(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "site"
+            shutil.copytree(SITE, root)
+            for app, (filename, _, _) in PROJECT_MASCOTS.items():
+                for route in ("/", f"/{app}/"):
+                    path = root / ROUTES[route]
+                    original = path.read_text()
+                    changed = re.sub(r'<img\b[^>]*data-mascot="' + app + r'"[^>]*>', '', original)
+                    path.write_text(changed)
+                    with self.subTest(app=app, route=route):
+                        self.assertTrue(any("mascot" in error.lower() for error in validate_site(root)))
+                    path.write_text(original)
+                asset = root / "assets" / filename
+                original = asset.read_bytes()
+                asset.unlink()
+                with self.subTest(missing=filename):
+                    self.assertTrue(validate_site(root))
+                asset.write_bytes(original)
 
 
 if __name__ == "__main__":
