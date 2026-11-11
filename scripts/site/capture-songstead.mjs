@@ -8,6 +8,7 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { createServer } from 'node:net';
 import { fileURLToPath } from 'node:url';
+import { act } from './capture-controls.mjs';
 import { chromium } from 'playwright';
 
 const binary = process.env.SONGSTEAD_BINARY;
@@ -21,9 +22,9 @@ let browser;
 try {
   const version = spawnSync(binary, ['--version'], { env: environment, encoding: 'utf8' });
   assert.equal(version.status, 0);
-  assert.equal(version.stdout.trim(), 'songstead 0.9.0');
+  assert.match(version.stdout.trim(), /^songstead [0-9]/);
   for (const username of ['alice', 'bobby', 'carol']) {
-    const result = spawnSync(binary, ['create-user', '--data-dir', directory, '--username', username, '--password-stdin'],
+    const result = spawnSync(binary, [username === 'alice' ? 'create-owner' : 'create-user', '--data-dir', directory, '--username', username, '--password-stdin'],
       { input: `${password}\n`, env: environment, encoding: 'utf8' });
     assert.equal(result.status, 0, result.stderr);
   }
@@ -54,7 +55,9 @@ try {
     await page.goto(`${base}/login`);
     await page.getByLabel('Username', { exact: true }).fill(username);
     await page.getByLabel('Password', { exact: true }).fill(password);
-    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    const signin = page.getByRole('button', { name: 'Sign in', exact: true });
+    if (!await signin.count()) throw new Error('Missing login control for '+username+': '+await page.locator('body').innerText());
+    await signin.click();
     await page.waitForURL('**/shelf');
     contexts.set(username, page);
   }
@@ -69,7 +72,7 @@ try {
     await page.goto(`${base}/recommendations/new`);
     await page.getByLabel('Music link', { exact: true }).fill(`https://music.example.com/${title.toLowerCase().replaceAll(' ', '-')}`);
     await page.locator('select[name=audience]').selectOption('members');
-    await page.locator('select[name=kind]').selectOption(kind);
+    await act(page.locator('select[name=kind]'), 'selectOption', kind);
     await page.getByLabel('Title, if you know it', { exact: true }).fill(title);
     await page.getByLabel('Artist', { exact: true }).fill(artist);
     await page.getByLabel('Genre', { exact: true }).fill(genre);
@@ -80,23 +83,14 @@ try {
   }
   // Fictional, local artwork fixtures demonstrate the cached thumbnail routes.
   const seeded = spawnSync('python3', ['-c', `
-import sqlite3,struct,zlib,sys
+import sqlite3,sys
 from pathlib import Path
-def chunk(kind,data):
-    return struct.pack('!I',len(data))+kind+data+struct.pack('!I',zlib.crc32(kind+data)&0xffffffff)
-def cover(colors):
-    width=320; height=240
-    rows=[]
-    for y in range(height):
-        row=bytearray()
-        for x in range(width): row.extend(colors[((x//64)+(y//60))%len(colors)])
-        rows.append(b'\\0'+row)
-    return b'\\x89PNG\\r\\n\\x1a\\n'+chunk(b'IHDR',struct.pack('!2I5B',width,height,8,2,0,0,0))+chunk(b'IDAT',zlib.compress(b''.join(rows)))+chunk(b'IEND',b'')
 with sqlite3.connect(Path(sys.argv[1])/'songstead.db') as db:
+    db.create_function('songstead_fold',1,lambda value: value.lower() if isinstance(value,str) else '',deterministic=True)
     db.execute('UPDATE recommendations SET created_at=1791457200-id*86400')
-    for title,colors in [('A little room for the rain',[(51,82,68),(185,204,180),(139,148,115)]),('Slow Saturday',[(46,71,94),(213,177,125),(156,92,62)]),('Northbound',[(51,56,67),(109,126,147),(144,67,68)])]:
-        db.execute('INSERT INTO media_artwork(media_id,content) SELECT id,? FROM media WHERE title=?',(cover(colors),title))
-`, directory], { encoding: 'utf8' });
+    for title,filename in [('A little room for the rain','evening-path.png'),('Slow Saturday','garden-cover.png'),('Northbound','coastal-cover.png')]:
+        db.execute('INSERT INTO media_artwork(media_id,content) SELECT id,? FROM media WHERE title=?',((Path(sys.argv[2])/filename).read_bytes(),title))
+`, directory, fileURLToPath(new URL('../../design/demo-assets/', import.meta.url))], { encoding: 'utf8' });
   assert.equal(seeded.status, 0, seeded.stderr);
   const page = contexts.get('alice');
   await page.goto(`${base}/recent?layout=tiles&discovery=all`);

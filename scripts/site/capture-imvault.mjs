@@ -19,29 +19,42 @@ try {
     await page.locator('input[name="password"]').fill('demo-password');
     await Promise.all([page.waitForURL(url => url.pathname !== '/login'), page.locator('form button[type="submit"]').click()]);
   }
-  await login('freya');
-  const sample = await readFile(new URL('../../design/screenshots/animation.gif', import.meta.url));
-  await page.evaluate(async bytes => {
+  await login('demo');
+  await page.evaluate(async () => {
     const token = document.querySelector('meta[name="csrf-token"]').content;
-    const keyResponse = await fetch('/settings/api-keys', { method: 'POST', headers: { 'HX-Request': 'true' },
-      body: new URLSearchParams({ csrf_token: token, name: 'local screenshot fixture' }) });
+    const created = await fetch('/settings/api-keys', { method: 'POST', headers: { 'HX-Request': 'true' }, body: new URLSearchParams({ csrf_token: token, name: 'disposable screenshot cleanup' }) });
+    if (!created.ok) throw new Error('Could not prepare demo cleanup');
+    const key = (await created.text()).match(/value="(imv_[A-Za-z0-9]*_[A-Za-z0-9]*)"/)[1];
+    const headers = { Authorization: `Bearer ${key}` };
+    const response = await fetch('/api/v1/files?limit=100', { headers });
+    if (!response.ok) throw new Error('Could not list disposable admin fixtures');
+    for (const file of (await response.json()).files) {
+      const removed = await fetch(`/api/v1/files/${file.id}`, { method: 'DELETE', headers });
+      if (!removed.ok) throw new Error('Could not remove disposable admin fixture');
+    }
+  });
+  await login('freya');
+  const samples = await Promise.all(['garden-table.jpg', 'coastal-walk.jpg'].map(async name => ({ name, bytes: [...await readFile(new URL('../../design/demo-assets/' + name, import.meta.url))] })));
+  await page.evaluate(async samples => {
+    const token = document.querySelector('meta[name="csrf-token"]').content;
+    const keyResponse = await fetch('/settings/api-keys', { method: 'POST', headers: { 'HX-Request': 'true' }, body: new URLSearchParams({ csrf_token: token, name: 'local screenshot fixture' }) });
     if (!keyResponse.ok) throw new Error('Could not create demo key');
     const key = (await keyResponse.text()).match(/value="(imv_[A-Za-z0-9]*_[A-Za-z0-9]*)"/)[1];
     const headers = { Authorization: `Bearer ${key}` };
     const response = await fetch('/api/v1/files?limit=100', { headers });
     if (!response.ok) throw new Error('Could not list demo files');
     for (const file of (await response.json()).files) {
-      if (file.name === 'animation.gif') {
-        const removed = await fetch(`/api/v1/files/${file.id}`, { method: 'DELETE', headers });
-        if (!removed.ok) throw new Error('Could not replace demo animation');
-      }
+      const removed = await fetch(`/api/v1/files/${file.id}`, { method: 'DELETE', headers });
+      if (!removed.ok) throw new Error('Could not remove generated test fixture');
     }
-    const body = new FormData();
-    body.append('files', new Blob([new Uint8Array(bytes)], { type: 'image/gif' }), 'animation.gif');
-    body.append('visibility', 'members');
-    const uploaded = await fetch('/api/v1/upload', { method: 'POST', headers, body });
-    if (!uploaded.ok) throw new Error('Could not upload demo animation');
-  }, [...sample]);
+    for (const sample of samples) {
+      const body = new FormData();
+      body.append('files', new Blob([new Uint8Array(sample.bytes)], { type: 'image/jpeg' }), sample.name);
+      body.append('visibility', 'members');
+      const uploaded = await fetch('/api/v1/upload', { method: 'POST', headers, body });
+      if (!uploaded.ok) throw new Error('Could not upload demo photo');
+    }
+  }, samples);
   await login('demo');
   await page.goto(new URL('/recent', base).href);
   await page.locator('.grid .card').first().waitFor();

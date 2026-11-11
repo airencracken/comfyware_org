@@ -45,7 +45,7 @@ class SongsteadTests(unittest.TestCase):
             document = Document((SITE / path).read_text())
             screenshots = [tag for tag in document.tags['img'] if tag.get('src') == '/assets/songstead-recent.webp']
             self.assertEqual(len(screenshots), 1)
-            self.assertEqual((screenshots[0]['width'], screenshots[0]['height']), ('1280', '1289'))
+            self.assertEqual((screenshots[0]['width'], screenshots[0]['height']), ('1280', '1218'))
             self.assertIn('recommendations', screenshots[0]['alt'])
         self.assertIn('fictional music, local sample artwork and demo accounts', (SITE / 'songstead/index.html').read_text())
 
@@ -59,7 +59,7 @@ class SongsteadTests(unittest.TestCase):
 
     def test_malformed_metadata_dimensions_and_injected_content_are_rejected(self):
         for old, new in [('https://comfyware.org/songstead/', 'https://example.org/songstead/'),
-                         ('<body', '<body onload="alert(1)"'), ('height="1289"', 'height="480"')]:
+                         ('<body', '<body onload="alert(1)"'), ('height="1218"', 'height="480"')]:
             with self.subTest(old=old), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory) / 'site'
                 shutil.copytree(SITE, root)

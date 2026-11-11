@@ -1,0 +1,34 @@
+{
+  "tool": "image_gen.imagegen",
+  "generated": "2026-11-11",
+  "purpose": "Fictional local demonstration media; never fetched from third parties in the browser.",
+  "assets": [
+    {
+      "file": "garden-table.jpg",
+      "original": "originals/garden-table.png",
+      "prompt": "Photorealistic natural fictional family photo sharing demo: ceramic cups, bread, apples, blue linen napkin and vase of wildflowers on a rustic garden table, soft afternoon light, natural documentary style; no people, text, logos, watermarks or UI."
+    },
+    {
+      "file": "coastal-walk.jpg",
+      "original": "originals/coastal-walk.png",
+      "prompt": "Fictional photo album demonstration: a coastal walk with a wooden footpath through dunes and grass toward a calm sea under soft overcast light, muted blues and greens; no people, text, signage, logos, watermarks or UI."
+    },
+    {
+      "file": "evening-path.png",
+      "original": "originals/evening-path.png",
+      "prompt": "Original square fictional album cover, tactile gouache and cut paper. Amber-lit cabin window on deep forest green hillside at dusk, winding pale path, layered rounded blue hills, tiny warm orange sun behind clouds; earthy palette, painterly paper grain. Artwork edge to edge. No text, typography, logos, watermarks, existing bands or recognizable copyrighted art."
+    }
+  ],
+  "derivatives": [
+    {
+      "file": "garden-cover.png",
+      "source": "garden-table.jpg",
+      "operation": "Resize within 640 x 640, strip metadata and encode PNG for Songstead cached artwork."
+    },
+    {
+      "file": "coastal-cover.png",
+      "source": "coastal-walk.jpg",
+      "operation": "Resize within 640 x 640, strip metadata and encode PNG for Songstead cached artwork."
+    }
+  ]
+}

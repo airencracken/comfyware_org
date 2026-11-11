@@ -239,3 +239,40 @@ To reproduce these derivatives with Pillow, convert the source to RGBA, use
 `thumbnail((256, 256), Image.Resampling.LANCZOS)`, and save as WebP with
 `quality=90, method=6`. Each app mascot has a 25,000-byte download budget,
 with intrinsic dimensions checked against the HTML. No new artwork is generated.
+
+## Fictional demonstration media and refreshed captures
+
+The Imvault and Songstead screenshots use the current applications, local demo
+accounts and original fictional media. Imvault shows two natural photos rather
+than synthetic gradient fixtures. Songstead uses an illustrated album sleeve and
+two photographic covers, with one intentional missing-artwork fallback. Source
+items and listening notes are fictional. The browser never contacts a provider.
+
+Original generated PNGs, upload-sized derivatives and the prompts are preserved
+outside the public site in `design/demo-assets/`. See
+[provenance and generation prompts](../../design/demo-assets/provenance.json).
+The images were generated with `image_gen.imagegen`; conventional ImageMagick
+resizing, metadata removal and PNG/JPEG encoding produced the app input files.
+
+To reproduce, start an isolated Imvault demo and run
+`node scripts/site/capture-imvault.mjs http://127.0.0.1:8080 /tmp/imvault-gallery.png`.
+This removes synthetic files in that disposable demo and uploads the fictional
+photos. The script refuses a non-loopback destination. For Songstead, set
+`SONGSTEAD_BINARY` to the built executable and `SCREENSHOT_OUTPUT` to a local PNG
+path, then run `node scripts/site/capture-songstead.mjs`. It creates and removes
+its own temporary database. It provisions a local owner before adding members.
+
+Keep original captures under `design/screenshots/`. Public WebP derivatives use
+ImageMagick `-strip -quality 84 -define webp:method=6`; the Imvault social PNG uses
+`-strip -colors 128 -define png:compression-level=9`. All public screenshots stay
+below the website's 200,000-byte image budget. Update the HTML dimensions and
+screenshot contract tests together when a capture's height changes.
+
+Folkweave, Tidings and Witmoot captures use their current offline demos too. Run
+`node scripts/site/capture-local.mjs APP http://127.0.0.1:PORT /tmp/capture.png`
+after starting a disposable demo. The capture tool supports those three app IDs,
+refuses non-loopback URLs and blocks external browser requests. Folkweave adds
+the two fictional photos through its ordinary posting form. Tidings keeps its
+fictional feed stories and Witmoot keeps its fictional board conversations.
+These captures preserve the existing 1280 by 1000 (Folkweave and Tidings) and
+1280 by 1233 (Witmoot) viewport contracts.

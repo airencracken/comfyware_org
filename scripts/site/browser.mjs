@@ -143,9 +143,9 @@ server.serve_forever()
             const box = image.getBoundingClientRect();
             return { width: box.width, height: box.height, naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight };
           });
-          check(screenshot.width > 0 && screenshot.naturalWidth === 1280 && screenshot.naturalHeight === 1289, `${route}: real Songstead screenshot at ${width}px`);
+          check(screenshot.width > 0 && screenshot.naturalWidth === 1280 && screenshot.naturalHeight === 1218, `${route}: real Songstead screenshot at ${width}px`);
           if (route === '/songstead/') {
-            check(Math.abs(screenshot.width / screenshot.height - 1280 / 1289) < 0.01, `Songstead screenshot preserves its full aspect ratio at ${width}px`);
+            check(Math.abs(screenshot.width / screenshot.height - 1280 / 1218) < 0.01, `Songstead screenshot preserves its full aspect ratio at ${width}px`);
             check(await page.getByRole('link', { name: 'View the full Songstead screenshot' }).getAttribute('href') === '/assets/songstead-recent.webp', 'Full screenshot link');
           }
         }
