@@ -61,6 +61,7 @@ test-content:
 	python3 scripts/site/test_docs.py
 	python3 scripts/site/test_comfylib.py
 	python3 scripts/site/test_initial_apps.py
+	python3 scripts/site/test_project_cards.py
 	python3 scripts/site/test_demo_assets.py
 
 test-http:

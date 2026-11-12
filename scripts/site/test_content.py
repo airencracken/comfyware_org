@@ -265,6 +265,7 @@ def project_mascot_errors(doc, route):
 
 
 def validate_site(root):
+    from test_project_cards import card_errors
     errors = []
     versions = release_versions()
     documents = {}
@@ -277,6 +278,8 @@ def validate_site(root):
         doc = Document(text)
         documents[route] = doc
         errors.extend(f"{route}: {error}" for error in editorial_errors(doc, route))
+        if route == "/":
+            errors.extend(card_errors((root / "index.html").read_text()))
         errors.extend(f"{route}: {error}" for error in container_errors(doc, route))
         errors.extend(f"{route}: {error}" for error in library_errors(doc, route, versions))
         errors.extend(f"{route}: {error}" for error in initial_app_errors(doc, route))

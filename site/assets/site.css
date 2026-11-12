@@ -122,7 +122,6 @@ p + p { margin-top: 1rem; }
 .project .project-tagline { color: var(--ink); font-weight: 550; margin-bottom: 9px; }
 .project-links { display: flex; flex-wrap: wrap; gap: 12px 22px; margin-top: auto; padding-top: 22px; font-size: .9rem; font-weight: 550; }
 .project-preview { margin: 0; padding: 12px 12px 0; background: var(--blue-wash); border-top: 1px solid var(--line); }
-.project-preview.witmoot { background: var(--wash); }
 .project-preview a { display: block; border: 1px solid var(--image-line); border-radius: 5px 5px 0 0; overflow: hidden; }
 .project-preview img { width: 100%; aspect-ratio: 1.2; object-fit: cover; object-position: top; }
 .project-preview figcaption a { display: inline; border: 0; border-radius: 0; }
@@ -164,7 +163,6 @@ details > p { padding: 0 24px 20px; color: var(--muted); }
 .product-hero .intro { max-width: 700px; }
 .product-note { font-size: .8rem; color: var(--muted); margin-top: 19px; }
 .screenshot { margin: 0 0 50px; background: var(--blue-wash); border: 1px solid var(--line); padding: 25px; border-radius: 8px; }
-.screenshot.witmoot { background: var(--wash); }
 .screenshot img { width: 100%; border: 1px solid var(--image-line); border-radius: 4px; }
 .screenshot figcaption { color: var(--muted); margin-top: 14px; font-size: .83rem; }
 .features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 65px; }

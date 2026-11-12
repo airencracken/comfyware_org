@@ -106,6 +106,10 @@ server.serve_forever()
         check(await page.locator('h1').count() === 1, `${route}: one main heading`);
         if (route === '/') {
           check(await page.locator('#software .project-mascot').count() === 5, 'Every app card has its mascot');
+          const colors = await page.locator('#software .project-preview').evaluateAll(items => items.map(item => getComputedStyle(item).backgroundColor));
+          check(colors.length === 5 && new Set(colors).size === 1, `All five preview frames share a color in ${colorScheme} at ${width}px`);
+          const demos = page.locator('#software .project-links').getByRole('link', { name: 'Try the local demo', exact: true });
+          check(await demos.count() === 5, 'Every app card has the same local demo action');
           for (const [app, filename] of Object.entries(mascots)) {
             const image = page.locator(`.project[aria-labelledby="${app}-title"] .project-mascot[data-mascot="${app}"]`);
             check(await image.count() === 1 && await image.isVisible(), `${app}: visible mascot in its home card`);
