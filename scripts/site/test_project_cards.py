@@ -54,6 +54,35 @@ def card_errors(text):
             errors.append(app + ': preview must use the shared frame styling')
     if text.count('>Try the local demo</a>') != 5:
         errors.append('Expected five consistently labeled local demo links')
+    taglines = re.findall(r'<h3 id="(\w+)-title">.*?</div>\s*<p class="project-tagline">[^<]+</p>', text, re.DOTALL)
+    if taglines != list(DEMOS):
+        errors.append('Every card needs a tagline under its title')
+    return errors
+
+
+def template_errors(text, app):
+    """Hold every product page to the same sections, in the same order."""
+    name = app.capitalize()
+    checks = [
+        ('eyebrow', rf'<p class="eyebrow">{name} · [^<]+</p><h1 id="welcome">[^<]+<br>[^<]+</h1>'),
+        ('get started button', rf'<a class="button" href="/{app}/docs/#install">Get started with {name} <span aria-hidden="true">&nbsp;→</span></a>'),
+        ('screenshot caption', rf'<figcaption>[^<]+ <a href="/assets/[\w-]+\.webp">View the full screenshot</a>\.</figcaption>'),
+        ('features', r'<div class="section-heading"><h2 id="features-heading">[^<]+</h2></div><div class="features">'),
+        ('backups', r'<h2 id="backups-heading">A copy worth keeping\.</h2>'),
+        ('getting started', r'<section id="getting-started" class="section getting-started" aria-labelledby="start-heading"><div><p class="eyebrow">Make it yours</p>'),
+        ('other project', r'<aside class="other-project"><p>[^<]+</p><a class="text-link" href="/\w+/">Meet \w+ <span aria-hidden="true">→</span></a></aside>'),
+    ]
+    errors = []
+    position = 0
+    for label, pattern in checks:
+        match = re.compile(pattern).search(text, position)
+        if not match:
+            errors.append(f'{app}: missing or out-of-order {label}')
+        else:
+            position = match.end()
+    steps = re.search(r'<ol class="steps">(.*?)</ol>', text, re.DOTALL)
+    if not steps or steps[1].count('<li>') != 3:
+        errors.append(f'{app}: getting started needs three steps')
     return errors
 
 
@@ -69,6 +98,25 @@ class ProjectCardTests(unittest.TestCase):
                                 link.replace('Try the local demo', 'Demo')):
                 with self.subTest(app=app, replacement=replacement):
                     self.assertTrue(card_errors(original.replace(link, replacement, 1)))
+
+    def test_product_pages_share_one_template(self):
+        for app in DEMOS:
+            with self.subTest(app=app):
+                self.assertEqual(template_errors((SITE / app / 'index.html').read_text(), app), [])
+
+    def test_template_mutations_are_detected(self):
+        text = (SITE / 'tidings/index.html').read_text()
+        for before, after in (('<p class="eyebrow">Tidings · ', '<p class="eyebrow">'),
+                              ('A copy worth keeping.', 'Backups and recovery.'),
+                              ('<p class="eyebrow">Make it yours</p>', ''),
+                              ('<li><strong>Pull up a chair.</strong>', '<li hidden><strong>Pull up a chair.</strong>'),
+                              ('View the full screenshot</a>.</figcaption>', '</a></figcaption>'),
+                              ('<aside class="other-project">', '<aside>')):
+            with self.subTest(before=before):
+                self.assertIn(before, text)
+                self.assertTrue(template_errors(text.replace(before, after, 1), 'tidings'))
+        home = (SITE / 'index.html').read_text()
+        self.assertTrue(card_errors(home.replace('<p class="project-tagline">The news you chose', '<p>The news you chose', 1)))
 
     def test_per_app_frame_mutation_is_detected(self):
         original = (SITE / 'index.html').read_text()
