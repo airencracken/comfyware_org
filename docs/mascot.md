@@ -1,5 +1,32 @@
 # Comfyware mascot
 
+## Style brief for new or regenerated mascots
+
+The current mascots come from three styles. Use this brief for any new or
+regenerated artwork so the family looks drawn by one hand. Do not redraw the
+existing images just to match it.
+
+- **An object with a face.** Each app's mascot is an everyday thing tied to
+  what the app does (a vault, a jukebox, a loom), with two open oval eyes and a
+  small smile. No eyebrows, blush or extra limbs unless the object needs them.
+- **One outline weight.** A single dark outline in `ink`, about 2.5% of the
+  canvas width (6 px on a 256 px image). Inner lines are thinner or absent.
+- **The site palette.** Large flat areas in these colours, with at most one
+  app accent (Imvault blue, Songstead gold) and gentle shading:
+  - ink `#273c32`
+  - green `#355746`
+  - rust `#984629`
+  - surface `#fffef9`
+  - wash `#eaf0e4`
+- **Readable small.** It must read clearly at 100 px wide on a home card.
+- **Transparent square canvas** with comfortable margins, one character, no
+  text, ground or background.
+
+Keep the original and the prompt in the app's repository, and add web
+derivatives as described in `scripts/site/README.md`.
+
+## The comfy robot
+
 A comfortable little robot in a plain sage-green sweater, curled into a cream
 armchair with a terracotta mug of coffee. The chosen version has a smooth head
 without an antenna, simple feet and joints, open oval eyes, and a small smile.

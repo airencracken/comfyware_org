@@ -1,5 +1,6 @@
 """Fictional screenshot media keeps provenance, originals and download budgets."""
 import json
+import re
 from pathlib import Path
 import unittest
 from test_content import image_size
@@ -39,5 +40,17 @@ class DemoAssetTests(unittest.TestCase):
         for webp,png in pairs:
             with self.subTest(image=webp.name):
                 self.assertLess(webp.stat().st_size,png.stat().st_size)
+
+    def test_mascot_brief_uses_the_site_palette(self):
+        brief=(ROOT/'docs/mascot.md').read_text().split('## The comfy robot')[0]
+        for phrase in ('An object with a face','One outline weight','The site palette'):
+            self.assertIn(phrase,brief)
+        css=(ROOT/'site/assets/site.css').read_text()
+        tokens=dict(re.findall(r'--([\w-]+): light-dark\((#[0-9a-f]{6}),',css))
+        colours=re.findall(r'^  - ([\w-]+) `(#[0-9a-f]{6})`$',brief,re.MULTILINE)
+        self.assertGreaterEqual(len(colours),4)
+        for name,value in colours:
+            with self.subTest(colour=name):
+                self.assertEqual(tokens.get(name),value,'brief colour must match the light site token')
 
 if __name__=='__main__':unittest.main()
