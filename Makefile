@@ -63,6 +63,7 @@ test-content:
 	python3 scripts/site/test_initial_apps.py
 	python3 scripts/site/test_project_cards.py
 	python3 scripts/site/test_demo_assets.py
+	python3 scripts/site/test_facts.py
 
 test-http:
 	python3 scripts/site/test_http.py

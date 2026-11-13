@@ -4,8 +4,9 @@ from pathlib import Path
 import re
 import unittest
 
-DEMOS = {'imvault': 'come-on-in', 'witmoot': 'come-on-in',
-         'songstead': 'build-and-try-it', 'folkweave': 'try-it', 'tidings': 'try-the-demo'}
+# Every card's demo link uses the same docs anchor; facts.json keeps the
+# app-specific README headings in one place.
+DEMOS = ('imvault', 'witmoot', 'songstead', 'folkweave', 'tidings')
 SITE = Path(__file__).resolve().parents[2] / 'site'
 
 
@@ -45,7 +46,7 @@ def card_errors(text):
         app = card['app']
         if app not in DEMOS:
             continue
-        expected = [f'/{app}/', f'https://github.com/airencracken/{app}#{DEMOS[app]}',
+        expected = [f'/{app}/', f'/{app}/docs/#demo',
                     f'/{app}/docs/', f'https://github.com/airencracken/{app}/blob/master/docs/containers.md']
         if card['links'][:4] != expected:
             errors.append(app + ': expected Meet, local demo, docs and Docker actions in that order')
@@ -62,10 +63,10 @@ class ProjectCardTests(unittest.TestCase):
 
     def test_missing_wrong_duplicate_or_mislabeled_demo_is_detected(self):
         original = (SITE / 'index.html').read_text()
-        for app, anchor in DEMOS.items():
-            href = f'https://github.com/airencracken/{app}#{anchor}'
-            link = f'<a href="{href}">Try the local demo</a>'
-            for replacement in ('', link + link, link.replace(app + '#', 'other#'), link.replace('Try the local demo', 'Demo')):
+        for app in DEMOS:
+            link = f'<a href="/{app}/docs/#demo">Try the local demo</a>'
+            for replacement in ('', link + link, link.replace('#demo', '#try-it'), link.replace(f'/{app}/', '/other/'),
+                                link.replace('Try the local demo', 'Demo')):
                 with self.subTest(app=app, replacement=replacement):
                     self.assertTrue(card_errors(original.replace(link, replacement, 1)))
 

@@ -1,0 +1,17 @@
+{
+  "go": "1.26.11",
+  "demos": {
+    "imvault": "come-on-in",
+    "witmoot": "come-on-in",
+    "songstead": "build-and-try-it",
+    "folkweave": "try-it",
+    "tidings": "try-the-demo"
+  },
+  "formats": {
+    "imvault": ["docker", "binaries", "debian", "gentoo"],
+    "witmoot": ["docker", "binaries", "debian", "gentoo"],
+    "songstead": ["docker", "binaries", "gentoo"],
+    "folkweave": ["docker", "binaries", "debian", "gentoo"],
+    "tidings": ["docker", "binaries", "debian", "gentoo"]
+  }
+}

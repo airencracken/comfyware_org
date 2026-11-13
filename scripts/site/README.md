@@ -114,7 +114,10 @@ they are not a claim that every planned portability feature already exists.
 The five released app cards and product pages show matching version labels and links to
 the exact release notes. The workshop section also shows Arise's release while
 retaining its experimental status. `releases.json` records the currently published stable
-versions; update it with those labels and links during each release. Content
+versions; update it with those labels and links during each release.
+`facts.json` records facts several pages repeat: the Go version, each app's
+packaging formats and README demo heading. `test_facts.py` checks every page
+against it, along with back links and lists that should name all five apps. Content
 checks reject missing, duplicate, stale or mismatched release links. Each app card and product page also links directly to the maintained Docker
 Compose guide. Documentation landing pages link to the matching GHCR package
 and explain architecture selection, version pins, and persistent storage. Deploy
