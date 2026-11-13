@@ -13,10 +13,15 @@ class SongsteadTests(unittest.TestCase):
         hero = text.split('<figure', 1)[0]
         self.assertIn('A recommendation is a gift,<br>never an assignment.', hero)
         self.assertIn('It can sit for six months without anything being wrong.', hero)
-        for phrase in ('Extremely eventual consistency:', 'because your friends have lives.',
+        for phrase in ('No rush.', 'Your friends have lives too.',
                        'No streaks, deadlines, unsolicited reminders, or playback tracking.',
                        'Opening a recommendation changes nothing.', 'does not host or stream music'):
             self.assertIn(phrase, text)
+
+    def test_headings_avoid_developer_jargon(self):
+        text = (SITE / 'songstead/index.html').read_text()
+        for jargon in ('eventual consistency', 'idempotent', 'schema', 'endpoint'):
+            self.assertNotIn(jargon, text.lower())
 
     def test_explains_private_likes_url_grouping_and_audiences(self):
         text = (SITE / 'songstead/index.html').read_text()

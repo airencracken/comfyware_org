@@ -60,6 +60,16 @@ def card_errors(text):
     return errors
 
 
+def arise_errors(text):
+    """Arise is experimental tooling, so it gets a note, not a card or hero spot."""
+    errors = []
+    if re.search(r'<h[1-3][^>]*>\s*<a href="https://github.com/airencracken/arise"', text):
+        errors.append('Arise must not have its own heading on the homepage')
+    if not re.search(r'<p class="workshop-note">[^\n]*data-release="arise"', text):
+        errors.append('Arise release belongs in the workshop note')
+    return errors
+
+
 def template_errors(text, app):
     """Hold every product page to the same sections, in the same order."""
     name = app.capitalize()
@@ -117,6 +127,15 @@ class ProjectCardTests(unittest.TestCase):
                 self.assertTrue(template_errors(text.replace(before, after, 1), 'tidings'))
         home = (SITE / 'index.html').read_text()
         self.assertTrue(card_errors(home.replace('<p class="project-tagline">The news you chose', '<p>The news you chose', 1)))
+
+    def test_arise_stays_a_quiet_workshop_note(self):
+        home = (SITE / 'index.html').read_text()
+        self.assertEqual(arise_errors(home), [])
+        promoted = home.replace('<p class="workshop-note">Also on the workbench: <a href="https://github.com/airencracken/arise">Arise</a>',
+                                '<div><h3><a href="https://github.com/airencracken/arise">Arise</a></h3><p>', 1)
+        self.assertNotEqual(promoted, home)
+        self.assertTrue(arise_errors(promoted))
+        self.assertTrue(arise_errors(home.replace('class="workshop-note"', 'class="hero-note"', 1)))
 
     def test_per_app_frame_mutation_is_detected(self):
         original = (SITE / 'index.html').read_text()
