@@ -30,4 +30,14 @@ class DemoAssetTests(unittest.TestCase):
             self.assertLess(path.stat().st_size,200000)
         self.assertLess((ROOT/'site/assets/imvault-gallery.png').stat().st_size,200000)
 
+    def test_webp_is_smaller_than_its_png_twin(self):
+        # Pages serve the WebP; a WebP larger than its PNG fallback wastes bytes.
+        # Only same-size twins compare; some PNGs are larger social previews.
+        pairs=[(w,w.with_suffix('.png')) for w in sorted((ROOT/'site/assets').glob('*.webp'))
+               if w.with_suffix('.png').is_file() and image_size(w)==image_size(w.with_suffix('.png'))]
+        self.assertTrue(any(w.name=='witmoot-board.webp' for w,_ in pairs))
+        for webp,png in pairs:
+            with self.subTest(image=webp.name):
+                self.assertLess(webp.stat().st_size,png.stat().st_size)
+
 if __name__=='__main__':unittest.main()

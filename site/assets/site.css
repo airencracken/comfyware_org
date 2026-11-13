@@ -1,72 +1,36 @@
 /* SPDX-License-Identifier: AGPL-3.0-or-later */
 :root {
+  /* Each token gives its light value, then its dark one. */
   color-scheme: light;
-  --paper: #f7f5ed;
-  --surface: #fffef9;
-  --ink: #273c32;
-  --muted: #56645a;
-  --green: #355746;
-  --rust: #984629;
-  --line: #d8dccf;
-  --wash: #eaf0e4;
-  --blue-wash: #e9eef3;
-  --button: #355746;
-  --button-hover: #284534;
-  --button-ink: #fffef9;
-  --control-line: #82917e;
-  --image-line: #c1cbbd;
-  --sponsor-line: #d5dfcb;
-  --selection: #d8e4cd;
-  --selection-ink: #203327;
+  --paper: light-dark(#f7f5ed, #18221e);
+  --surface: light-dark(#fffef9, #202d26);
+  --ink: light-dark(#273c32, #f0eee3);
+  --muted: light-dark(#56645a, #b7c2b5);
+  --green: light-dark(#355746, #b4d2ac);
+  --rust: light-dark(#984629, #e7ad8a);
+  --line: light-dark(#d8dccf, #3d4b40);
+  --wash: light-dark(#eaf0e4, #27372c);
+  --blue-wash: light-dark(#e9eef3, #26333a);
+  --button: light-dark(#355746, #b4d2ac);
+  --button-hover: light-dark(#284534, #c9e2c3);
+  --button-ink: light-dark(#fffef9, #1c3021);
+  --control-line: light-dark(#82917e, #81977e);
+  --image-line: light-dark(#c1cbbd, #536651);
+  --sponsor-line: light-dark(#d5dfcb, #43573e);
+  --selection: light-dark(#d8e4cd, #b4d2ac);
+  --selection-ink: light-dark(#203327, #18221e);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 16px;
   line-height: 1.65;
   background: var(--paper);
   color: var(--ink);
 }
+/* Dark follows the device unless the picker chose light, or when it chose dark. */
 @media screen and (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --paper: #18221e;
-    --surface: #202d26;
-    --ink: #f0eee3;
-    --muted: #b7c2b5;
-    --green: #b4d2ac;
-    --rust: #e7ad8a;
-    --line: #3d4b40;
-    --wash: #27372c;
-    --blue-wash: #26333a;
-    --button: #b4d2ac;
-    --button-hover: #c9e2c3;
-    --button-ink: #1c3021;
-    --control-line: #81977e;
-    --image-line: #536651;
-    --sponsor-line: #43573e;
-    --selection: #b4d2ac;
-    --selection-ink: #18221e;
-  }
+  :root:not([data-theme="light"]) { color-scheme: dark; }
 }
 @media screen {
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-    --paper: #18221e;
-    --surface: #202d26;
-    --ink: #f0eee3;
-    --muted: #b7c2b5;
-    --green: #b4d2ac;
-    --rust: #e7ad8a;
-    --line: #3d4b40;
-    --wash: #27372c;
-    --blue-wash: #26333a;
-    --button: #b4d2ac;
-    --button-hover: #c9e2c3;
-    --button-ink: #1c3021;
-    --control-line: #81977e;
-    --image-line: #536651;
-    --sponsor-line: #43573e;
-    --selection: #b4d2ac;
-    --selection-ink: #18221e;
-  }
+  :root[data-theme="dark"] { color-scheme: dark; }
 }
 * { box-sizing: border-box; }
 body { margin: 0; }

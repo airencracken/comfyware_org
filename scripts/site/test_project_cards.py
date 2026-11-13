@@ -52,6 +52,10 @@ def card_errors(text):
             errors.append(app + ': expected Meet, local demo, docs and Docker actions in that order')
         if card['preview'] != 'project-preview':
             errors.append(app + ': preview must use the shared frame styling')
+    captions = re.findall(r'<figcaption>(.*?)</figcaption>', text)
+    pattern = r'[A-Z][^.·<]*, with (?:fictional|sample) [^.·<]+ · <a href="/assets/[\w-]+\.webp">Full screenshot</a>'
+    if len(captions) != 5 or not all(re.fullmatch(pattern, caption) for caption in captions):
+        errors.append('Card captions must read "What it shows, with fictional content · Full screenshot"')
     if text.count('>Try the local demo</a>') != 5:
         errors.append('Expected five consistently labeled local demo links')
     taglines = re.findall(r'<h3 id="(\w+)-title">.*?</div>\s*<p class="project-tagline">[^<]+</p>', text, re.DOTALL)
@@ -136,6 +140,25 @@ class ProjectCardTests(unittest.TestCase):
         self.assertNotEqual(promoted, home)
         self.assertTrue(arise_errors(promoted))
         self.assertTrue(arise_errors(home.replace('class="workshop-note"', 'class="hero-note"', 1)))
+
+    def test_card_caption_mutations_are_detected(self):
+        home = (SITE / 'index.html').read_text()
+        for before, after in (('The timeline, with fictional posts and photos ·', 'The timeline, with fictional posts and photos. ·'),
+                              ('The reading table, with fictional stories ·', 'A look inside · the reading table ·'),
+                              ('>Full screenshot</a></figcaption>', '>View it</a></figcaption>')):
+            with self.subTest(before=before):
+                self.assertIn(before, home)
+                self.assertTrue(card_errors(home.replace(before, after, 1)))
+
+    def test_theme_tokens_are_written_once(self):
+        css = (SITE / 'assets/site.css').read_text()
+        names = re.findall(r'(--[\w-]+)\s*:', css)
+        self.assertTrue(names)
+        self.assertEqual(len(names), len(set(names)), 'a theme token is defined twice')
+        for name, value in re.findall(r'(--[\w-]+)\s*:\s*([^;]+);', css):
+            with self.subTest(token=name):
+                self.assertRegex(value, r'^light-dark\(#[0-9a-f]{6}, #[0-9a-f]{6}\)$')
+        self.assertEqual(len(re.findall(r'\{ color-scheme: dark; \}', css)), 2, 'dark mode needs the device and picker switches')
 
     def test_per_app_frame_mutation_is_detected(self):
         original = (SITE / 'index.html').read_text()

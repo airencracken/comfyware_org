@@ -156,8 +156,9 @@ PNG versions of Imvault and Witmoot remain available for social preview cards
   This replaces only the demo member's sample GIF and captures the real Recent
   page. The script refuses remote URLs and blocks external requests. Convert
   the result using the lossless command below.
-- `assets/witmoot-board.webp`: losslessly converted from `witmoot/docs/images/board.png` at
-  `8f20e2f26bf594394526ee7f6a558f013fd3c47b` (0.7.2).
+- `assets/witmoot-board.webp`: lossless WebP of the 256-colour `assets/witmoot-board.png`,
+  made with `magick assets/witmoot-board.png -strip -define webp:lossless=true -define webp:method=6`.
+  It is smaller than the PNG; `test_demo_assets.py` checks that every WebP stays smaller than its PNG twin.
 
 - `assets/songstead-recent.webp`: captured from Songstead 0.9.0 at
   `c9e5bbd`, with four fictional music
