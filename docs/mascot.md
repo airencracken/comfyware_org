@@ -39,16 +39,13 @@ without an antenna, simple feet and joints, open oval eyes, and a small smile.
 - Edit target: `site/assets/comfy-robot.png` at commit
   `ef931f9c27acf8bcd50a2d1851c1365e3e4a8f86`. The prior version and edit prompt
   remain in Git history.
-- The original concept took inspiration from the simple face and outline of
-  Imvault's keeper and the green/cream colors and gentle shading of Witmoot's
-  Moot Knight. Its original prompt is in the
-  [concept notes](../design/mascot-options/README.md).
-- This pass removes the antenna and reduces sweater ribbing, mechanical joints,
-  and small shading details while retaining the selected expression and pose.
-- The generated original is preserved unchanged outside the public site.
-  The public derivatives are resized and compressed, retaining transparency.
-  Separate small PNGs supply the favicon and Apple touch icon. Earlier concepts
-  are kept under `design/mascot-options/`.
+- The first concept borrowed the face and outline of Imvault's keeper and the
+  colours of Witmoot's Moot Knight. The concept image is in
+  `design/mascot-options/robot.png`.
+- The final edit removed the antenna and simplified the sweater, joints and
+  shading.
+- The original stays outside the public site. Small PNGs supply the favicon and
+  Apple touch icon.
 
 To regenerate the public images with ImageMagick:
 
@@ -59,9 +56,8 @@ magick design/mascot/comfy-robot-original.png -resize 680x680 -strip \
   -colors 256 -define png:compression-level=9 site/assets/comfy-robot.png
 ```
 
-The download budgets are 45,000 bytes for the homepage WebP and 100,000 bytes
-for the social PNG. Content and browser checks enforce these limits and verify
-that both assets decode at the intended size with transparent margins.
+The download budgets are 45,000 bytes for the WebP and 100,000 bytes for the
+PNG.
 
 ## Final edit prompt
 

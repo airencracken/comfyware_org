@@ -105,11 +105,8 @@ deploy; run the full `make check` there or locally before publishing.
 
 ## Content and assets
 
-The homepage's approach section summarizes our own
-[Comfyware principles page](../../site/principles/index.html):
-local sovereignty, accountable hosts, respect for attention, bounded communities,
-exit and ownership, and community-defined house rules. These guide product choices;
-they are not a claim that every planned portability feature already exists.
+The homepage's approach section summarizes the
+[Comfyware principles page](../../site/principles/index.html).
 
 The five released app cards and product pages show matching version labels and links to
 the exact release notes. The workshop section also shows Arise's release while
@@ -139,9 +136,8 @@ browser checks exercise them without JavaScript. Tests also reject release
 prose and oversized product copy before deployment. A failed content gate leaves
 the existing deployed files untouched.
 
-The footer names Marcus and links to the public GitHub profile. The homepage
-links to website issues for questions and suggestions. Do not add a personal
-address or location without the maintainer choosing to publish it.
+The footer names Marcus and links to his public GitHub profile. Do not add a
+personal address or location unless he chooses to publish it.
 
 Screenshots show isolated demo/test instances. Browser images use lossless WebP;
 PNG versions of Imvault and Witmoot remain available for social preview cards
@@ -196,18 +192,9 @@ Earlier concepts are kept under `design/mascot-options/`.
 Website code and these project assets use the repository's AGPL-3.0-or-later
 license; see the root `LICENSE`.
 
-## Folkweave and Tidings
+## Folkweave and Tidings artwork
 
-Folkweave and Tidings have initial 0.1.0 releases, homepage cards alongside the
-other apps, product pages, and five-topic documentation landing pages. Like
-the other apps, each links to current release notes, published container images,
-Linux/Debian installation, service setup, and verified backup/recovery guidance.
-Folkweave's lack of parental approval controls and original photo retention
-remain explicit. Tidings' page now describes transactional JSON import and
-verified online backups. Browser checks cover both apps and sponsorship links.
-
-The existing project mascots are copied into this website as small transparent
-derivatives; no new illustration was generated for these pages:
+The Folkweave and Tidings mascots are small copies of each app's own artwork:
 
 - `assets/folkweave-loom.webp` is the app's 256 × 256 asset at Folkweave commit
   `f26c0d6`. Its companion PNG is resized from that repository's preserved
