@@ -69,7 +69,7 @@ def arise_errors(text):
     errors = []
     if re.search(r'<h[1-3][^>]*>\s*<a href="https://github.com/airencracken/arise"', text):
         errors.append('Arise must not have its own heading on the homepage')
-    if not re.search(r'<p class="workshop-note">[^\n]*data-release="arise"', text):
+    if not re.search(r'<p class="workshop-note">[^\n]*href="https://github[.]com/airencracken/arise/releases/latest"', text):
         errors.append('Arise release belongs in the workshop note')
     return errors
 
@@ -140,6 +140,7 @@ class ProjectCardTests(unittest.TestCase):
         self.assertNotEqual(promoted, home)
         self.assertTrue(arise_errors(promoted))
         self.assertTrue(arise_errors(home.replace('class="workshop-note"', 'class="hero-note"', 1)))
+        self.assertTrue(arise_errors(home.replace('/arise/releases/latest', '/arise/releases/tag/v0.0.42', 1)))
 
     def test_card_caption_mutations_are_detected(self):
         home = (SITE / 'index.html').read_text()

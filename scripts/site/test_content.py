@@ -33,7 +33,7 @@ PROJECT_MASCOTS = {
 MASCOT_BUDGETS = {"assets/comfy-robot.webp": 45_000, "assets/comfy-robot.png": 100_000}
 MASCOT_BUDGETS.update({"assets/" + filename: 25_000 for filename, _, _ in PROJECT_MASCOTS.values()})
 ICON_BUDGET = 64_000
-RELEASE_NAMES = {"imvault": "Imvault", "witmoot": "Witmoot", "songstead": "Songstead", "arise": "Arise", "comfylib": "Comfylib", "folkweave": "Folkweave", "tidings": "Tidings"}
+RELEASE_NAMES = {"imvault": "Imvault", "witmoot": "Witmoot", "songstead": "Songstead", "comfylib": "Comfylib", "folkweave": "Folkweave", "tidings": "Tidings"}
 RELEASE_FILE = Path(__file__).with_name("releases.json")
 VOID = set("area base br col embed hr img input link meta param source track wbr".split())
 

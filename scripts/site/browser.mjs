@@ -231,9 +231,9 @@ server.serve_forever()
   check(await page.locator('[data-module="comfylib"]').innerText() === `go get github.com/airencracken/comfylib@v${releases.comfylib}`, 'Comfylib command pins the current library release');
   check(await page.getByRole('link', { name: `Comfylib ${releases.comfylib}`, exact: true }).getAttribute('href') === `https://github.com/airencracken/comfylib/releases/tag/v${releases.comfylib}`, 'Comfylib version links to the published release');
   await page.goto(base + '/');
-  const ariseRelease=page.getByRole('link',{name:`Arise ${releases.arise}`,exact:true});
+  const ariseRelease=page.getByRole('link',{name:"Latest Arise release",exact:true});
   check(await ariseRelease.isVisible(),'Arise release is visible alongside its experimental status');
-  check(await ariseRelease.getAttribute('href')===`https://github.com/airencracken/arise/releases/tag/v${releases.arise}`,'Arise release links to matching notes');
+  check(await ariseRelease.getAttribute('href')==="https://github.com/airencracken/arise/releases/latest",'Arise release links to matching notes');
   for (const app of ['imvault', 'witmoot', 'songstead', 'folkweave', 'tidings']) {
     await page.goto(base+`/${app}/`);
     await page.getByRole('link', { name: 'Documentation', exact: true }).click();
