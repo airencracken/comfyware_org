@@ -193,6 +193,8 @@ def library_errors(doc, route, versions):
     errors = []
     if route == "/" and "/comfylib/" not in links:
         errors.append("Homepage must expose the Comfylib project page")
+    if route in ("/", "/comfylib/") and "Used by the current apps:" not in " ".join(doc.main_text):
+        errors.append("Label the Comfylib version as the one used by the apps")
     if route == "/comfylib/":
         expected = f"go get github.com/airencracken/comfylib@v{versions['comfylib']}"
         commands = [attrs for attrs in doc.tags["code"] if attrs.get("data-module") == "comfylib"]
@@ -201,6 +203,8 @@ def library_errors(doc, route, versions):
         for link in ("https://github.com/airencracken/comfylib", "https://pkg.go.dev/github.com/airencracken/comfylib", "/imvault/", "/witmoot/", "/songstead/"):
             if link not in links:
                 errors.append("Library page must expose source, reference and companion apps")
+        if "https://github.com/airencracken/comfylib/releases/latest" not in links:
+            errors.append("Library page must link to the latest library release")
         if any(attrs.get("data-container") for attrs in doc.tags["a"]):
             errors.append("Library page must describe its Go module installation")
     return errors
