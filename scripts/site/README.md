@@ -103,6 +103,20 @@ is missing, relative, `/`, inside this repository, or that contains it. Set
 `DEPLOY_DIR=/srv/comfyware` to match the Caddyfile's default root. CI does not
 deploy; run the full `make check` there or locally before publishing.
 
+## Track discovery
+
+In Google Search Console, use the **Search results** performance report for
+`https://comfyware.org/imvault/` and `https://comfyware.org/folkweave/`. Filter
+queries with **Doesn't match regex** and use
+`(?i)comfyware|im\s*vault|folk\s*weave|airencracken`. Record impressions and
+clicks for the available queries in each 28-day period. Compare equal-length
+periods after the updated pages have been indexed. See
+[Search Console filtering](https://support.google.com/webmasters/answer/17011165).
+
+Search for **self-hosted image host with ShareX** and **self-hosted private
+family social network** for a quick check any time. Use the same search engine
+and location when repeating the check, and record which app pages surfaced.
+
 ## Content and assets
 
 The homepage's approach section summarizes the

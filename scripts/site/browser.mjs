@@ -185,6 +185,10 @@ server.serve_forever()
   check(await page.locator('details').first().getAttribute('open') === null, 'FAQ closes with keyboard');
   await page.getByRole('link', { name: 'Meet Imvault' }).click();
   check(new URL(page.url()).pathname === '/imvault/', 'Imvault navigation works without JavaScript');
+  await page.getByRole('link', { name: 'ShareX', exact: true }).click();
+  check(new URL(page.url()).pathname === '/imvault/docs/' && new URL(page.url()).hash === '#sharex', 'Imvault links directly to ShareX setup without JavaScript');
+  check(await page.getByRole('heading', { name: 'Upload screenshots from ShareX.', exact: true }).isVisible(), 'ShareX setup is readable');
+  await page.goBack();
   await page.getByRole('link', { name: 'Meet Witmoot' }).click();
   check(new URL(page.url()).pathname === '/witmoot/', 'Cross-project navigation works without JavaScript');
   await page.getByRole('link', { name: 'Comfyware home' }).click();

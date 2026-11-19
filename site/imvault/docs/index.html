@@ -25,7 +25,7 @@
     <label class="theme-picker" hidden><span class="visually-hidden">Color theme</span><select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></header>
   <main id="main" class="wrap reading-page" tabindex="-1">
     <a class="back-link" href="/imvault/"><span aria-hidden="true">←</span> Back to Imvault</a>
-    <section class="hero product-hero" aria-labelledby="welcome"><p class="eyebrow">Imvault · Documentation</p><h1 id="welcome">Look after<br>your place.</h1><p class="intro">Install, run, and back up Imvault. Each guide links to the app’s own docs.</p><nav class="docs-nav" aria-label="Documentation topics"><a href="#install">Install</a><a href="#operate">Configure</a><a href="#backups">Back up</a><a href="#upgrades">Upgrade</a><a href="#help">Get help</a></nav></section>
+    <section class="hero product-hero" aria-labelledby="welcome"><p class="eyebrow">Imvault · Documentation</p><h1 id="welcome">Look after<br>your place.</h1><p class="intro">Install, run, and back up Imvault. Each guide links to the app’s own docs.</p><nav class="docs-nav" aria-label="Documentation topics"><a href="#install">Install</a><a href="#operate">Configure</a><a href="#sharex">ShareX</a><a href="#backups">Back up</a><a href="#upgrades">Upgrade</a><a href="#help">Get help</a></nav></section>
     <section id="install" class="section" aria-labelledby="install-heading"><h2 id="install-heading">Install and get started.</h2><ul class="guide-list">
       <li><a data-container="imvault" href="https://github.com/airencracken/imvault/blob/master/docs/containers.md">Run with Docker Compose</a><p>Published images for amd64 or arm64, with version pins, storage, and upgrades.</p></li>
       <li><a href="https://github.com/airencracken/imvault/pkgs/container/imvault">Published container images</a><p>Every release tag on GitHub Container Registry.</p></li>
@@ -42,6 +42,20 @@
       <li><a href="https://github.com/airencracken/imvault/blob/master/docs/reverse-proxies.md">HTTPS reverse proxies</a><p>Put HTTPS in front before you share it.</p></li>
       <li><a href="https://github.com/airencracken/imvault/blob/master/docs/library.md">Organize your library</a><p>Browse camera dates, organize batches, and recover files from Trash.</p></li>
     </ul></section>
+    <section id="sharex" class="section" aria-labelledby="sharex-heading">
+      <h2 id="sharex-heading">Upload screenshots from ShareX.</h2>
+      <p>In your Imvault account settings, open <strong>API keys</strong> and create a key. In ShareX, add a custom image uploader with these settings.</p>
+      <dl class="sharex-settings">
+        <dt>Request URL</dt><dd><code>https://img.example.com/api/v1/upload?format=text</code></dd>
+        <dt>Request method</dt><dd><code>POST</code></dd>
+        <dt>Body</dt><dd>Multipart form data</dd>
+        <dt>File form name</dt><dd><code>files</code></dd>
+        <dt>Header</dt><dd><code>Authorization: Bearer YOUR_API_KEY</code></dd>
+        <dt>Response URL field</dt><dd>Leave empty</dd>
+      </dl>
+      <p>Replace <code>img.example.com</code> with your Imvault host. The response body is the file URL. Imvault uses your instance’s default sharing level unless you set the <code>visibility</code> form field. Use <code>public</code> only when anyone with the link should be able to open it.</p>
+      <p>See the <a href="https://github.com/airencracken/imvault/blob/master/docs/api.md">Imvault API guide</a> and the <a href="https://getsharex.com/docs/custom-uploader">ShareX custom uploader guide</a>.</p>
+    </section>
     <section id="backups" class="section" aria-labelledby="backups-heading"><h2 id="backups-heading">Back up and recover.</h2><p>The app backs itself up every day. Keep a copy on another machine, and test a restore before you need one.</p><ul class="guide-list">
       <li><a href="https://github.com/airencracken/imvault/blob/master/docs/automatic-backups.md">Automatic backups</a><p>What’s in a backup, how long copies are kept, and how to spot a failure.</p></li>
       <li><a href="https://github.com/airencracken/imvault/blob/master/docs/operations.md">Operations and restore drills</a></li><li><a href="https://github.com/airencracken/imvault/blob/master/docs/accounts.md">Accounts and data</a></li>

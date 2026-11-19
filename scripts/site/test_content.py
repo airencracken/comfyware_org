@@ -49,6 +49,7 @@ class Document(HTMLParser):
         self.nav_depth = None
         self.nav_text = None
         self.inline_script = False
+        self.title = ""
         self.links = []
         self.current_link = None
         self.main_text = []
@@ -85,6 +86,8 @@ class Document(HTMLParser):
             self.stack.pop()
 
     def handle_data(self, data):
+        if self.stack[-1:] == ["title"]:
+            self.title += data
         if "main" in self.stack:
             self.main_text.append(data)
             if self.current_link is None or "data-release" not in self.current_link[0]:
@@ -137,6 +140,32 @@ def release_errors(doc, apps, versions):
         expected = f"https://github.com/airencracken/{app}/releases/tag/v{versions[app]}"
         if attrs.get("href") != expected or text != f"{RELEASE_NAMES[app]} {versions[app]}":
             errors.append(f"{app}: Release version and link must match the release manifest")
+    return errors
+
+
+def discovery_errors(doc, route):
+    app = route.strip("/")
+    use_cases = {
+        "imvault": ("screenshot and photo sharing", "ShareX"),
+        "folkweave": ("private family social network", "private family social network"),
+    }
+    links = {attrs.get("href") for attrs in doc.tags["a"]}
+    errors = []
+    if app in use_cases:
+        title, description = use_cases[app]
+        names = {attrs.get("name"): attrs.get("content", "") for attrs in doc.tags["meta"]}
+        social = [attrs.get("content") for attrs in doc.tags["meta"] if attrs.get("property") == "og:title"]
+        if "self-hosted" not in doc.title.lower() or title not in doc.title.lower() or social != [doc.title]:
+            errors.append("Discoverable title must describe the app's purpose")
+        if description not in names.get("description", "") or "noindex" in names.get("robots", "").lower():
+            errors.append("Discoverable page must describe its use case and allow indexing")
+    if route == "/imvault/" and "/imvault/docs/#sharex" not in links:
+        errors.append("Imvault must link directly to ShareX setup")
+    if route == "/imvault/docs/":
+        values = ("https://img.example.com/api/v1/upload?format=text", "Authorization: Bearer YOUR_API_KEY")
+        if ("sharex" not in doc.ids or "#sharex" not in links
+                or not all(value in doc.main_text for value in values)):
+            errors.append("ShareX guide must expose working upload and authentication settings")
     return errors
 
 
@@ -282,6 +311,7 @@ def validate_site(root):
         doc = Document(text)
         documents[route] = doc
         errors.extend(f"{route}: {error}" for error in editorial_errors(doc, route))
+        errors.extend(f"{route}: {error}" for error in discovery_errors(doc, route))
         if route == "/":
             errors.extend(card_errors((root / "index.html").read_text()))
         errors.extend(f"{route}: {error}" for error in container_errors(doc, route))
@@ -409,6 +439,22 @@ def validate_site(root):
 
 
 class SiteContractTests(unittest.TestCase):
+    def test_discovery_and_sharex_contract_reject_mutations(self):
+        cases = (
+            ("/imvault/", "Self-hosted screenshot and photo sharing", "Photo library"),
+            ("/imvault/", 'href="/imvault/docs/#sharex"', 'href="/imvault/docs/"'),
+            ("/folkweave/", "Self-hosted private family social network", "Private timeline"),
+            ("/folkweave/", '<meta name="description"', '<meta name="robots" content="noindex"><meta name="description"'),
+            ("/imvault/docs/", "/api/v1/upload?format=text", "/api/v1/upload"),
+            ("/imvault/docs/", "Authorization: Bearer YOUR_API_KEY", "Authorization: YOUR_API_KEY"),
+        )
+        for route, before, after in cases:
+            with self.subTest(route=route, mutation=after):
+                original = (SITE / ROUTES[route]).read_text()
+                self.assertIn(before, original)
+                self.assertEqual(discovery_errors(Document(original), route), [])
+                self.assertTrue(discovery_errors(Document(original.replace(before, after, 1)), route))
+
     def test_all_app_versions_match_their_release_notes(self):
         versions = release_versions()
         for route in ("index.html", "imvault/index.html", "witmoot/index.html", "songstead/index.html", "folkweave/index.html", "tidings/index.html", "comfylib/index.html"):
