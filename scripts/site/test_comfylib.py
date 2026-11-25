@@ -38,7 +38,7 @@ class ComfylibTests(unittest.TestCase):
                 ('href="https://pkg.go.dev/github.com/airencracken/comfylib"', 'href="https://example.org/"'),
                 ('data-release="comfylib"', 'data-release="imvault"'),
                 ("Used by the current apps:", "Current release:"),
-                ("/comfylib/releases/latest", "/comfylib/releases/tag/v0.7.3"),
+                ("/comfylib/releases/latest", "/comfylib/releases/tag/v0.8.0"),
                 ('href="/imvault/"', 'href="javascript:alert(1)"'),
             ):
                 with self.subTest(mutation=after):

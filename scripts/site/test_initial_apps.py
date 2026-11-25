@@ -39,6 +39,12 @@ class InitialAppTests(unittest.TestCase):
             mutations = [
                 ("parental approval controls are not implemented" if app == "folkweave" else "A live indicator shows progress", "future work"),
             ]
+            if app == "tidings":
+                mutations.extend((
+                    ("New installations show suggested categories by default", "Suggestions start off"),
+                    ("preview recent headlines", "preview every full article"),
+                    ("The For You shelf", "The reading list"),
+                ))
             for before, after in mutations:
                 with self.subTest(app=app, mutation=after):
                     self.assertIn(before, original)

@@ -1,8 +1,8 @@
 {
-  "imvault": "0.28.0",
-  "witmoot": "0.24.2",
-  "songstead": "0.17.3",
-  "comfylib": "0.7.3",
-  "folkweave": "0.9.0",
-  "tidings": "0.9.3"
+  "imvault": "0.28.2",
+  "witmoot": "0.25.1",
+  "songstead": "0.18.1",
+  "comfylib": "0.8.0",
+  "folkweave": "0.10.0",
+  "tidings": "0.11.0"
 }

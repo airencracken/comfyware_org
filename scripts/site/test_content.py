@@ -244,7 +244,11 @@ def initial_app_errors(doc, route):
     app = route.strip("/")
     required = {
         "folkweave": ("parental approval controls are not implemented", "Original uploads are not retained"),
-        "tidings": ("pictures supplied by feeds", "A live indicator shows progress"),
+        "tidings": (
+            "pictures supplied by feeds", "A live indicator shows progress",
+            "by topic and language", "preview recent headlines",
+            "New installations show suggested categories by default", "The For You shelf",
+        ),
     }
     if app not in required:
         return []
