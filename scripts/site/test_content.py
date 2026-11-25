@@ -243,7 +243,10 @@ def initial_app_errors(doc, route):
     """Preserve accurate product descriptions for the two newer apps."""
     app = route.strip("/")
     required = {
-        "folkweave": ("parental approval controls are not implemented", "Original uploads are not retained"),
+        "folkweave": (
+            "parental approval controls are not implemented", "Original uploads are not retained",
+            "Catch up from a private bookmark", "replies in conversations you follow",
+        ),
         "tidings": (
             "pictures supplied by feeds", "A live indicator shows progress",
             "by topic and language", "preview recent headlines",

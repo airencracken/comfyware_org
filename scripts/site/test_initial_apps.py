@@ -39,6 +39,11 @@ class InitialAppTests(unittest.TestCase):
             mutations = [
                 ("parental approval controls are not implemented" if app == "folkweave" else "A live indicator shows progress", "future work"),
             ]
+            if app == "folkweave":
+                mutations.extend((
+                    ("Catch up from a private bookmark", "Catch up from the group’s bookmark"),
+                    ("replies in conversations you follow", "replies across the whole group"),
+                ))
             if app == "tidings":
                 mutations.extend((
                     ("New installations show suggested categories by default", "Suggestions start off"),
