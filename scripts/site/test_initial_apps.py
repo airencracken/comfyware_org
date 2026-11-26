@@ -46,7 +46,8 @@ class InitialAppTests(unittest.TestCase):
                 ))
             if app == "tidings":
                 mutations.extend((
-                    ("New installations show suggested categories by default", "Suggestions start off"),
+                    ("Find feeds by interest or by one of your own tags", "Choose from set topics"),
+                    ("local news by country or territory", "nearby news"),
                     ("preview recent headlines", "preview every full article"),
                     ("The For You shelf", "The reading list"),
                 ))

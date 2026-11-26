@@ -250,7 +250,8 @@ def initial_app_errors(doc, route):
         "tidings": (
             "pictures supplied by feeds", "A live indicator shows progress",
             "by topic and language", "preview recent headlines",
-            "New installations show suggested categories by default", "The For You shelf",
+            "Find feeds by interest or by one of your own tags", "enable interest search",
+            "local news by country or territory", "The For You shelf",
         ),
     }
     if app not in required:
